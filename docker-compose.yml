@@ -1,0 +1,55 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3.7'
+
+services:
+  production:
+    hostname: app-production
+    restart: unless-stopped
+    build:
+      context: . 
+      dockerfile: Dockerfile
+      target: base
+    environment:
+      PORT: "8081"
+    volumes:
+      - type: bind
+        source: .
+        target: /home/app
+    working_dir: /home/app
+    ports:
+      - "8081:8081" 
+    command: bash -c "./scripts/production.sh"
+
+  development:
+    hostname: app-development
+    networks:
+      - new
+    restart: unless-stopped
+    build:
+      context: . 
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - type: bind
+        source: .
+        target: /home/app
+    working_dir: /home/app
+    ports:
+      - "8080:8080" 
+    command: bash -c "go mod download && make serve"
+  db:
+    hostname: db-development
+    image: sqlserver_image:latest
+    networks:
+      new:
+        aliases:
+          - database
+    environment:
+      TZ: America/New_York
+      ACCEPT_EULA: Y
+      SA_PASSWORD: P4tate!!
+    ports:
+      - "12433:1433"
+    command: /opt/mssql/bin/sqlservr
+networks:
+  new:
