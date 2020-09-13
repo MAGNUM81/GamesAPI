@@ -1,6 +1,6 @@
 FROM microsoft/mssql-server-linux
 
-ENV TZ=America/Los_Angeles
+ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
@@ -10,7 +10,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     curl https://packages.microsoft.com/config/ubuntu/16.04/mssql-server-2017.list | tee /etc/apt/sources.list.d/mssql-server.list && \
     apt-get update
 	
-RUN apt-get install -y mssql-server-fts
 CMD /opt/mssql/bin/sqlservr
 
 EXPOSE 1433
