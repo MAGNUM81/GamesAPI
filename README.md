@@ -12,6 +12,12 @@ Cette interface devra respecter certains standards afin d'être familière aux d
 # Mise en route
 Les prérequis pour compiler et exécuter le projet sont les suivants: 
 - Docker Engine (se nomme 'Docker for Desktop' sous Windows)
+- image Docker pour MSSQL
+
+Si vous n'avez pas d'image Docker MSSQL, voici une marche à suivre:
+1. Ouvrir un invite de commande dans ./dockerizedDatabase
+2. Exécuter `docker build --tag sqlserver_image:latest .`
+3. Vous avez désormais une image MSSQL valide pour l'environnement.
 
 Marche à suivre pour lancer un serveur Dev avec base de données MSSQL et mise à jour automatique:
 1. Ouvrir un invite de commande à la racine du projet
