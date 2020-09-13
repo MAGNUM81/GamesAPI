@@ -2,20 +2,22 @@ package api
 
 import (
 	"GamesAPI/src/database"
+	"GamesAPI/src/router"
 	"github.com/gin-gonic/gin"
 )
 
 func Bootstrap(r *gin.Engine) {
-	database.Instance = ConnectDatabase()
+	ConnectDatabase()
 	defer database.Instance.Close()
-	InitRoutes(r)
+	router.InitRoutes(r)
 
 	err := r.Run()
 	HandleErrors(err)
+
 }
 
 func HandleErrors(err error) {
 	if err != nil {
-		panic("Something went horribly wrong!\n" + err.Error())
+		panic("Something went horribly wrong!")
 	}
 }

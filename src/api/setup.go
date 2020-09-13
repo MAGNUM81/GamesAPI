@@ -2,7 +2,7 @@ package api
 
 import (
 	"GamesAPI/src/database"
-	"github.com/jinzhu/gorm"
+	"GamesAPI/src/entityBinder"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 )
 
@@ -12,13 +12,8 @@ const user = "sa"
 const password = "P4tate!!"
 const databaseName = "GamesGoDB"
 
-func ConnectDatabase() *gorm.DB {
-	var db = database.Connect(server, port, user, password, databaseName)
-	database.BindEntities(db)
-	return db
-}
-
-func CreateRepositories() {
-
+func ConnectDatabase() {
+	database.Instance = database.Connect(server, port, user, password, databaseName)
+	entityBinder.BindEntities(database.Instance)
 }
 
