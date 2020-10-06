@@ -21,7 +21,7 @@ Si vous n'avez pas d'image Docker MSSQL, voici une marche à suivre:
 
 Marche à suivre pour lancer un serveur Dev avec base de données MSSQL et mise à jour automatique:
 1. Ouvrir un invite de commande à la racine du projet
-2. Taper "docker-compose up development db"
+2. Taper `docker-compose up development db`
 3. Codez comme s'il n'y avait pas de lendemain!
 
 
