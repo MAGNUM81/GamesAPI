@@ -7,17 +7,16 @@ import (
 )
 
 func Bootstrap(r *gin.Engine) {
-	ConnectDatabase()
-	defer database.Instance.Close()
+	var dbInstance = database.Setup()
+	defer dbInstance.Close()
 	router.InitRoutes(r)
 
 	err := r.Run()
 	HandleErrors(err)
-
 }
 
 func HandleErrors(err error) {
 	if err != nil {
-		panic("Something went horribly wrong!")
+		panic("Something went horribly wrong! " + err.Error())
 	}
 }
