@@ -11,8 +11,8 @@ before_script:
 
 
 stages:
-  - test
   - build
+  - test
   - deploy
 
 
@@ -23,3 +23,13 @@ compile:
   artifacts:
     paths:
       - mybinary
+
+testing:
+  stage: test
+  script:
+    - cd ..
+    - cd $GOPATH/src/$REPO_NAME/tests/unit/controllers
+    - go test
+    - cd ..
+    - cd $GOPATH/src/$REPO_NAME/tests/unit/domain
+    - go test
