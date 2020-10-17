@@ -1,15 +1,14 @@
 image: golang:latest
 
 variables:
-  REPO: depot.dinf.usherbrooke.ca
-  GROUP: dinf/projets/a20
-  PROJECT: eq05-gamesapi
+  
+  REPO_NAME: depot.dinf.usherbrooke.ca/dinf/projets/a20/eq05-gamesapi
 
 before_script:
-  - mkdir -p $GOPATH/src/$REPO/$GROUP $GOPATH/src/_/builds
-  - cp -r $CI_PROJECT_DIR $GOPATH/src/$REPO/$GROUP/$PROJECT
-  - ln -s $GOPATH/src/$REPO/$GROUP $GOPATH/src/_/builds/$GROUP
-  - go get -v -d ./...
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME
+
 
 stages:
   - test
