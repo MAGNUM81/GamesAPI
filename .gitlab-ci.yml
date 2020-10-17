@@ -1,7 +1,7 @@
 image: golang:latest
 
 variables:
-  REPO_NAME: https://depot.dinf.usherbrooke.ca/dinf/projets/a20/eq05-gamesapi/tree/develop/src
+  REPO_NAME: https://depot.dinf.usherbrooke.ca/dinf/projets/a20/eq05-gamesapi
 
 before_script:
   - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
