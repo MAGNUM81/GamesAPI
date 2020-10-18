@@ -1,0 +1,37 @@
+image: golang:latest
+
+variables:
+  
+  REPO_NAME: depot.dinf.usherbrooke.ca/dinf/projets/a20/eq05-gamesapi
+
+#This create a folder in the image with the content of the repo 
+#and prepare everything we need before compilling. This should 
+#not have to be changed. 
+before_script:
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME/src
+
+#Define the order the scripts will be run.
+stages:
+  - build
+  - test
+  - deploy
+
+
+compile:
+  stage: build
+  script:
+    - go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/mybinary
+
+#Artifacts deactivated until we need it (cost 20mb of storage per CI run)
+#  artifacts:
+#    paths:
+#      - mybinary
+
+testing:
+  stage: test
+  script:
+    - cd $GOPATH/src/$REPO_NAME/tests
+#This line make the runner check into sub-directory to run test recursively
+    - go test ./...
