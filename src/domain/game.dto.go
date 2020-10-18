@@ -14,7 +14,7 @@ type Game struct {
 	ReleaseDate time.Time `json:"releaseDate"`
 }
 
-func (g *Game) Validate() errorUtils.GameError {
+func (g *Game) Validate() errorUtils.EntityError {
 	//TODO: add validation rules for a Game
 	//		for example, we could validate that the title is not empty or nil
 	return nil

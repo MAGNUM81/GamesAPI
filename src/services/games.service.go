@@ -12,14 +12,14 @@ var (
 type gamesService struct{}
 
 type gamesServiceInterface interface {
-	GetGame(uint64) (*domain.Game, errorUtils.GameError)
-	CreateGame(*domain.Game) (*domain.Game, errorUtils.GameError)
-	UpdateGame(game *domain.Game) (*domain.Game, errorUtils.GameError)
-	DeleteGame(uint64) errorUtils.GameError
-	GetAllGames() ([]domain.Game, errorUtils.GameError)
+	GetGame(uint64) (*domain.Game, errorUtils.EntityError)
+	CreateGame(*domain.Game) (*domain.Game, errorUtils.EntityError)
+	UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError)
+	DeleteGame(uint64) errorUtils.EntityError
+	GetAllGames() ([]domain.Game, errorUtils.EntityError)
 }
 
-func (g *gamesService) GetGame(gameId uint64) (*domain.Game, errorUtils.GameError) {
+func (g *gamesService) GetGame(gameId uint64) (*domain.Game, errorUtils.EntityError) {
 	game, err := domain.GameRepo.Get(gameId)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (g *gamesService) GetGame(gameId uint64) (*domain.Game, errorUtils.GameErro
 	return game, nil
 }
 
-func (g *gamesService) GetAllGames() ([]domain.Game, errorUtils.GameError) {
+func (g *gamesService) GetAllGames() ([]domain.Game, errorUtils.EntityError) {
 	games, err := domain.GameRepo.GetAll()
 	if err != nil {
 		return nil, err
@@ -35,15 +35,15 @@ func (g *gamesService) GetAllGames() ([]domain.Game, errorUtils.GameError) {
 	return games, nil
 }
 
-func (g *gamesService) CreateGame(game *domain.Game) (*domain.Game, errorUtils.GameError) {
-	message, err := domain.GameRepo.Create(game)
+func (g *gamesService) CreateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
+	game, err := domain.GameRepo.Create(game)
 	if err != nil {
 		return nil, err
 	}
-	return message, nil
+	return game, nil
 }
 
-func (g *gamesService) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.GameError) {
+func (g *gamesService) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
 	current, err := domain.GameRepo.Get(uint64(game.ID))
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (g *gamesService) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.G
 	return updatedGame, nil
 }
 
-func (g *gamesService) DeleteGame(gameId uint64) errorUtils.GameError {
+func (g *gamesService) DeleteGame(gameId uint64) errorUtils.EntityError {
 	game, err := domain.GameRepo.Get(gameId)
 	if err != nil {
 		return err

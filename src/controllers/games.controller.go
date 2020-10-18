@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func getGameId(gameIdParam string) (uint64, errorUtils.GameError) {
+func getGameId(gameIdParam string) (uint64, errorUtils.EntityError) {
 	gameId, gameError := strconv.ParseUint(gameIdParam, 10, 64)
 	if gameError != nil {
 		return 0, errorUtils.NewBadRequestError("game id should be a number")
@@ -17,21 +17,14 @@ func getGameId(gameIdParam string) (uint64, errorUtils.GameError) {
 	return gameId, nil
 }
 
-func isGameError(c *gin.Context, e errorUtils.GameError) bool {
-	if e != nil {
-		c.JSON(e.Status(), e)
-	}
-	return e != nil
-}
-
 func GetGame(c *gin.Context) {
 	gameId, gameErr := getGameId(c.Param("id"))
-	if isGameError(c, gameErr) {
+	if errorUtils.IsEntityError(c, gameErr) {
 		return
 	}
 
 	game, err := services.GamesService.GetGame(gameId)
-	if isGameError(c, err){
+	if errorUtils.IsEntityError(c, err){
 		return
 	}
 
@@ -40,7 +33,7 @@ func GetGame(c *gin.Context) {
 
 func GetAllGames(c *gin.Context) {
 	games, err := services.GamesService.GetAllGames()
-	if isGameError(c, err){
+	if errorUtils.IsEntityError(c, err){
 		return
 	}
 
@@ -51,12 +44,12 @@ func CreateGame(c *gin.Context) {
 	var game domain.Game
 	if err := c.ShouldBindJSON(&game); err != nil {
 		gameErr := errorUtils.NewUnprocessableEntityError("invalid json body")
-		c.JSON(gameErr.Status(), gameErr)
+		c.JSON(gameErr.Status(), gameErr.Error())
 		return
 	}
 
 	g, err := services.GamesService.CreateGame(&game)
-	if isGameError(c, err) {
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -65,7 +58,7 @@ func CreateGame(c *gin.Context) {
 
 func UpdateGame(c *gin.Context) {
 	gameId, err := getGameId(c.Param("id"))
-	if isGameError(c, err) {
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -77,7 +70,7 @@ func UpdateGame(c *gin.Context) {
 	}
 	game.ID = uint(gameId)
 	g, err := services.GamesService.UpdateGame(&game)
-	if isGameError(c, err) {
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -86,10 +79,10 @@ func UpdateGame(c *gin.Context) {
 
 func DeleteGame(c *gin.Context) {
 	gameId, err := getGameId(c.Param("id"))
-	if isGameError(c, err) {
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
-	if err := services.GamesService.DeleteGame(gameId); isGameError(c, err) {
+	if err := services.GamesService.DeleteGame(gameId); errorUtils.IsEntityError(c, err) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})

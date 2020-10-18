@@ -2,36 +2,62 @@ package domain
 
 import (
 	"GamesAPI/src/domain"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mssql"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
-func TestGameRepo_GetAll(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		assert.Errorf(t, err, "An unexpected error occurred when opening a stub database connection.")
-	}
-	defer db.Close()
+type GameTestSuite struct {
+	suite.Suite
+	DB   *gorm.DB
+	mock sqlmock.Sqlmock
 
-	gdb, err := gorm.Open("mssql", db)
-	if err != nil {
-		assert.Errorf(t, err, "An unexpected error occurred when opening a stub database connection.")
-	}
-	repo := domain.NewGameRepository(gdb)
+	repository domain.GameRepoInterface
+	game     *domain.Game
+	dsnCount int64
+}
+
+func (s *GameTestSuite) BeforeTest(_, _ string) {
+	var (
+		err error
+	)
+	dsn := fmt.Sprintf("sqlmock_db_%d", s.dsnCount)
+	_, s.mock, err = sqlmock.NewWithDSN(dsn)
+	require.NoError(s.T(), err)
+
+	s.DB, err = gorm.Open("sqlmock", dsn)
+	require.NoError(s.T(), err)
+
+	s.DB.LogMode(true)
+
+	s.repository = domain.NewGameRepository(s.DB)
+	s.dsnCount++
+}
+
+func(s *GameTestSuite) TearDownTest() {
+	s.DB.Close()
+}
+
+func TestGamesTestSuite(t *testing.T) {
+	suite.Run(t, new(GameTestSuite))
+}
+
+func (s *GameTestSuite) TestGameRepo_GetAll() {
 
 	//Test for getting all games from empty table.
-	const sqlSelectAll = `SELECT * from games`
-	mock.ExpectQuery(sqlSelectAll).
+	const sqlSelectAll = `SELECT (.+) FROM "games"`
+	s.mock.ExpectQuery(sqlSelectAll).
 		WillReturnRows(sqlmock.NewRows(nil))
 
-	data, err := repo.GetAll()
+	data, err := s.repository.GetAll()
 	if err != nil {
-		assert.Fail(t, "An error occurred during repo.GetAll")
+		assert.Fail(s.T(), "An error occurred during repo.GetAll")
 	}
 
-	assert.Equal(t, []domain.Game{}, data) //result should be an empty slice.
+	assert.Equal(s.T(), []domain.Game{}, data) //result should be an empty slice.
 	//END: Test for getting all games from empty table
 }
