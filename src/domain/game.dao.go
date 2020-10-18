@@ -10,11 +10,11 @@ var (
 )
 
 type GameRepoInterface interface {
-	Get(uint64) (*Game, errorUtils.GameError)
-	Create(*Game) (*Game, errorUtils.GameError)
-	Update(*Game) (*Game, errorUtils.GameError)
-	Delete(uint64) errorUtils.GameError
-	GetAll() ([]Game, errorUtils.GameError)
+	Get(uint64) (*Game, errorUtils.EntityError)
+	Create(*Game) (*Game, errorUtils.EntityError)
+	Update(*Game) (*Game, errorUtils.EntityError)
+	Delete(uint64) errorUtils.EntityError
+	GetAll() ([]Game, errorUtils.EntityError)
 	Initialize(*gorm.DB)
 }
 
@@ -30,7 +30,7 @@ func NewGameRepository(db *gorm.DB) GameRepoInterface {
 	return &gameRepo{db: db}
 }
 
-func (g *gameRepo) Get(gameId uint64) (*Game, errorUtils.GameError) {
+func (g *gameRepo) Get(gameId uint64) (*Game, errorUtils.EntityError) {
 	var game Game
 	if err := g.db.Where("id = ?", gameId).First(&game).Error; err != nil {
 		return nil, errorUtils.NewNotFoundError(err.Error())
@@ -38,12 +38,12 @@ func (g *gameRepo) Get(gameId uint64) (*Game, errorUtils.GameError) {
 	return &game, nil
 }
 
-func (g *gameRepo) Create(game *Game) (*Game, errorUtils.GameError) {
+func (g *gameRepo) Create(game *Game) (*Game, errorUtils.EntityError) {
 	g.db.Create(game)
 	return game, nil
 }
 
-func (g *gameRepo) Update(game *Game) (*Game, errorUtils.GameError) {
+func (g *gameRepo) Update(game *Game) (*Game, errorUtils.EntityError) {
 	if err := g.db.Where("id = ?", game.ID).First(&game).Error; err != nil {
 		return nil, errorUtils.NewNotFoundError(err.Error())
 	}
@@ -51,7 +51,7 @@ func (g *gameRepo) Update(game *Game) (*Game, errorUtils.GameError) {
 	return game, nil
 }
 
-func (g *gameRepo) Delete(gameId uint64) errorUtils.GameError {
+func (g *gameRepo) Delete(gameId uint64) errorUtils.EntityError {
 	var game Game
 	if err := g.db.Where("id = ?", gameId).First(&game).Error; err != nil {
 		return errorUtils.NewNotFoundError(err.Error())
@@ -60,7 +60,7 @@ func (g *gameRepo) Delete(gameId uint64) errorUtils.GameError {
 	return nil
 }
 
-func (g *gameRepo) GetAll() ([]Game, errorUtils.GameError) {
+func (g *gameRepo) GetAll() ([]Game, errorUtils.EntityError) {
 	var games []Game
 	g.db.Find(&games)
 	return games, nil
