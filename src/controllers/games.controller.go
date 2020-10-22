@@ -28,7 +28,7 @@ func GetGame(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": game})
+	c.JSON(http.StatusOK, game)
 }
 
 func GetAllGames(c *gin.Context) {
@@ -37,14 +37,14 @@ func GetAllGames(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": games})
+	c.JSON(http.StatusOK, games)
 }
 
 func CreateGame(c *gin.Context) {
 	var game domain.Game
 	if err := c.ShouldBindJSON(&game); err != nil {
 		gameErr := errorUtils.NewUnprocessableEntityError("invalid json body")
-		c.JSON(gameErr.Status(), gameErr.Error())
+		c.JSON(gameErr.Status(), gameErr)
 		return
 	}
 
@@ -53,7 +53,7 @@ func CreateGame(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": g})
+	c.JSON(http.StatusCreated, g)
 }
 
 func UpdateGame(c *gin.Context) {
@@ -74,7 +74,7 @@ func UpdateGame(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": g})
+	c.JSON(http.StatusOK, g)
 }
 
 func DeleteGame(c *gin.Context) {

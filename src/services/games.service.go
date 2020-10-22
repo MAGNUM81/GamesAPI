@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	GamesService gamesServiceInterface = &gamesService{}
+	GamesService GamesServiceInterface = &gamesService{}
 )
 
 type gamesService struct{}
 
-type gamesServiceInterface interface {
+type GamesServiceInterface interface {
 	GetGame(uint64) (*domain.Game, errorUtils.EntityError)
 	CreateGame(*domain.Game) (*domain.Game, errorUtils.EntityError)
 	UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError)
