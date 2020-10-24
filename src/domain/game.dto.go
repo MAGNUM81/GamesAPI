@@ -17,7 +17,16 @@ type Game struct {
 }
 
 func (g *Game) Validate() errorUtils.EntityError {
-	//TODO: add validation rules for a Game
-	//		for example, we could validate that the title is not empty or nil
+	if g.Title == "" {
+		return errorUtils.NewUnprocessableEntityError("Game title cannot be empty")
+	}
+
+	if g.Developer == "" {
+		return errorUtils.NewUnprocessableEntityError("Game developer cannot be empty")
+	}
+
+	if g.Publisher == "" {
+		return errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty")
+	}
 	return nil
 }

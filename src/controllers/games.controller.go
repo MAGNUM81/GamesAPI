@@ -42,7 +42,7 @@ func GetAllGames(c *gin.Context) {
 
 func CreateGame(c *gin.Context) {
 	var game domain.Game
-	if err := c.ShouldBindJSON(&game); err != nil {
+	if err := c.ShouldBindJSON(&game); game.Validate() != nil || err != nil {
 		gameErr := errorUtils.NewUnprocessableEntityError("invalid json body")
 		c.JSON(gameErr.Status(), gameErr)
 		return
@@ -63,7 +63,7 @@ func UpdateGame(c *gin.Context) {
 	}
 
 	var game domain.Game
-	if err := c.ShouldBindJSON(&game); err != nil {
+	if err := c.ShouldBindJSON(&game); game.Validate() != nil || err != nil {
 		gameErr := errorUtils.NewUnprocessableEntityError("invalid json body")
 		c.JSON(gameErr.Status(), gameErr)
 		return

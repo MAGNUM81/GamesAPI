@@ -181,7 +181,7 @@ func (s *GameControllerTestSuite) TestCreateGame_Success() {
 			ReleaseDate: utils.GetDate("2015-07-07"),
 		}, nil
 	})
-	jsonBody := `{"name":"dev", "email":"dev@test.com"}`
+	jsonBody := `{"title":"Rocket League", "developer":"Psyonix", "publisher":"Psyonix"}`
 	req, err := http.NewRequest(http.MethodPost, "/games", bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -200,8 +200,26 @@ func (s *GameControllerTestSuite) TestCreateGame_Success() {
 	assert.EqualValues(t, "Psyonix", game.Publisher)
 }
 
-func (s *GameControllerTestSuite) TestCreateGame_InvalidJson() {
+func (s *GameControllerTestSuite) TestCreateGame_InvalidJsonBadFieldType() {
+	//here we put a number instead of string for title. we expect an invalid json error
 	jsonBody := `{"title":123456, "developer":"Psyonix", "publisher":"Psyonix"}`
+	req, err := http.NewRequest(http.MethodPost, "/games", bytes.NewBufferString(jsonBody))
+	if err != nil {
+		s.T().Errorf("error while creating the request: %v\n", err)
+	}
+	s.r.ServeHTTP(s.rr, req)
+	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
+	t:=s.T()
+	assert.Nil(t, err)
+	assert.NotNil(t, apiErr)
+	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
+	assert.EqualValues(t, "invalid json body", apiErr.Message())
+	assert.EqualValues(t, "invalid_request", apiErr.Error())
+}
+
+func (s *GameControllerTestSuite) TestCreateGame_InvalidJsonMissingField() {
+	//here we put a typo in 'title' field. we expect an invalid json error.
+	jsonBody := `{"titl":"Rocket League", "developer":"Psyonix", "publisher":"Psyonix"}`
 	req, err := http.NewRequest(http.MethodPost, "/games", bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -227,7 +245,7 @@ func (s *GameControllerTestSuite) TestUpdateGame_Success() {
 		}, nil
 	})
 	id := "1"
-	jsonBody := `{"name":"dev updated", "email":"dev.updated@test.com"}`
+	jsonBody := `{"title":"Rocket League 2", "developer":"Psyonix, but better", "publisher":"Not Psyonix"}`
 	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -260,7 +278,26 @@ func (s *GameControllerTestSuite) TestUpdateGame_InvalidId() {
 	assert.EqualValues(t, "bad_request", apiErr.Error())
 }
 
-func (s *GameControllerTestSuite) TestUpdateGame_InvalidJson() {
+func (s *GameControllerTestSuite) TestUpdateGame_InvalidJsonFieldMissing() {
+	//here we puroposely put a typo in 'title' field name. we expect it to return us an invalid JSON error
+	jsonBody := `{"titl":"Rocket League", "developer":"Psyonix", "publisher":"Psyonix"}`
+	id:="1"
+	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
+	if err != nil {
+		s.T().Errorf("error while creating the request: %v\n", err)
+	}
+	s.r.ServeHTTP(s.rr, req)
+	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
+	t:=s.T()
+	assert.Nil(t, err)
+	assert.NotNil(t, apiErr)
+	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
+	assert.EqualValues(t, "invalid json body", apiErr.Message())
+	assert.EqualValues(t, "invalid_request", apiErr.Error())
+}
+
+func (s *GameControllerTestSuite) TestUpdateGame_InvalidJsonBadFieldType() {
+	//here we put a number instead of a string for the title. we expect an invalid json error
 	jsonBody := `{"title":123456, "developer":"Psyonix", "publisher":"Psyonix"}`
 	id:="1"
 	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
@@ -283,7 +320,7 @@ func (s *GameControllerTestSuite) TestUpdateGame_ErrorUpdating() {
 	})
 
 	id := "1"
-	jsonBody := `{"name":"dev updated", "email":"dev.updated@test.com"}`
+	jsonBody := `{"title":"Rocket League 2", "developer":"Psyonix, but better", "publisher":"Not Psyonix"}`
 	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
