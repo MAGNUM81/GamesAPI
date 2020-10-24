@@ -23,6 +23,7 @@ type gameRepo struct {
 }
 
 func (g *gameRepo) Initialize(db *gorm.DB) {
+	g.db = db
 	db.AutoMigrate(&Game{})
 }
 
@@ -39,7 +40,9 @@ func (g *gameRepo) Get(gameId uint64) (*Game, errorUtils.EntityError) {
 }
 
 func (g *gameRepo) Create(game *Game) (*Game, errorUtils.EntityError) {
-	g.db.Create(game)
+	if dbc := g.db.Create(game); dbc.Error != nil {
+		return nil, errorUtils.NewInternalServerError(dbc.Error.Error())
+	}
 	return game, nil
 }
 
@@ -56,8 +59,8 @@ func (g *gameRepo) Delete(gameId uint64) errorUtils.EntityError {
 	if err := g.db.Where("id = ?", gameId).First(&game).Error; err != nil {
 		return errorUtils.NewNotFoundError(err.Error())
 	}
-	g.db.Delete(&game)
-	return nil
+	dbc := g.db.Delete(&game)
+	return errorUtils.NewEntityError(dbc.Error)
 }
 
 func (g *gameRepo) GetAll() ([]Game, errorUtils.EntityError) {

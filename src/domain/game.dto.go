@@ -2,16 +2,18 @@ package domain
 
 import (
 	"GamesAPI/src/utils/errorUtils"
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type Game struct {
-	gorm.Model
+	ID        uint64 `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 	Title       string    `json:"title"`
 	Developer   string    `json:"developer"`
 	Publisher   string    `json:"publisher"`
-	ReleaseDate time.Time `json:"releaseDate"`
+	ReleaseDate time.Time `gorm:"column:releaseDate" json:"releaseDate"`
 }
 
 func (g *Game) Validate() errorUtils.EntityError {
