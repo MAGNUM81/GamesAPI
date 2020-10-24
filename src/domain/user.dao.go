@@ -27,6 +27,7 @@ func NewUserRepository(db *gorm.DB) UserRepoInterface {
 }
 
 func (u *userRepo) Initialize(db *gorm.DB) {
+	u.db = db
 	db.AutoMigrate(&User{})
 }
 

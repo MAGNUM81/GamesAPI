@@ -68,7 +68,7 @@ func UpdateGame(c *gin.Context) {
 		c.JSON(gameErr.Status(), gameErr)
 		return
 	}
-	game.ID = uint(gameId)
+	game.ID = gameId
 	g, err := services.GamesService.UpdateGame(&game)
 	if errorUtils.IsEntityError(c, err) {
 		return
