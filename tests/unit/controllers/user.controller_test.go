@@ -193,8 +193,24 @@ func (s *UserControllerTestSuite) TestCreateUser_Success() {
 	assert.EqualValues(t, "dev@test.com", user.Email)
 }
 
-func (s *UserControllerTestSuite) TestCreateUser_InvalidJson() {
+func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonBadFieldType() {
 	jsonBody := `{"name":123456, "email":"dev@test.com"}`
+	req, err := http.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(jsonBody))
+	if err != nil {
+		s.T().Errorf("error while creating the request: %v\n", err)
+	}
+	s.r.ServeHTTP(s.rr, req)
+	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
+	t:=s.T()
+	assert.Nil(t, err)
+	assert.NotNil(t, apiErr)
+	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
+	assert.EqualValues(t, "invalid json body", apiErr.Message())
+	assert.EqualValues(t, "invalid_request", apiErr.Error())
+}
+
+func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonMissingField() {
+	jsonBody := `{"nam":"dev", "email":"dev@test.com"}`
 	req, err := http.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)

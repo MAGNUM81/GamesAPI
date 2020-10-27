@@ -2,6 +2,7 @@ package domain
 
 import (
 	"GamesAPI/src/domain"
+	"GamesAPI/src/utils"
 	"GamesAPI/src/utils/errorUtils"
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
@@ -10,16 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"testing"
-	"time"
 )
 
-
-
-func getDate(strDate string) time.Time {
-	const dateFormat = "2006-01-02"
-	date, _ := time.Parse(dateFormat, strDate)
-	return date
-}
 
 type GameTestSuite struct {
 	suite.Suite
@@ -73,8 +66,8 @@ func (s *GameTestSuite) TestGameRepo_GetAll_Empty() {
 
 func (s *GameTestSuite) TestGameRepo_GetAll_NotEmpty() {
 	rows := sqlmock.NewRows([]string{"id", "title", "developer", "publisher", "releaseDate"}).
-		AddRow(1, "Rocket League", "Psyonix", "Psyonix", getDate("2015-07-07")).
-		AddRow(2, "The Witcher 3: Wild Hunt", "CD PROJEKT RED", "CD PROJEKT RED", getDate("2015-05-18"))
+		AddRow(1, "Rocket League", "Psyonix", "Psyonix", utils.GetDate("2015-07-07")).
+		AddRow(2, "The Witcher 3: Wild Hunt", "CD PROJEKT RED", "CD PROJEKT RED", utils.GetDate("2015-05-18"))
 	s.mock.ExpectQuery(`SELECT (.+) FROM "games"`).
 		WillReturnRows(rows)
 
@@ -87,14 +80,14 @@ func (s *GameTestSuite) TestGameRepo_GetAll_NotEmpty() {
 			Title:       "Rocket League",
 			Developer:   "Psyonix",
 			Publisher:   "Psyonix",
-			ReleaseDate: getDate("2015-07-07"),
+			ReleaseDate: utils.GetDate("2015-07-07"),
 		},
 		{
 			ID: 		 2,
 			Title:       "The Witcher 3: Wild Hunt",
 			Developer:   "CD PROJEKT RED",
 			Publisher:   "CD PROJEKT RED",
-			ReleaseDate: getDate("2015-05-18"),
+			ReleaseDate: utils.GetDate("2015-05-18"),
 		},
 	}
 
@@ -116,7 +109,7 @@ func (s *GameTestSuite) TestGameRepo_Get_Empty() {
 //Test for getting a single game from table with one matching row
 func (s *GameTestSuite) TestGameRepo_Get_OneValidRow() {
 	rows := sqlmock.NewRows([]string{"id", "title", "developer", "publisher", "releaseDate"}).
-		AddRow(1, "Rocket League", "Psyonix", "Psyonix", getDate("2015-07-07"))
+		AddRow(1, "Rocket League", "Psyonix", "Psyonix", utils.GetDate("2015-07-07"))
 	const sql = `SELECT (.+) FROM "games"`
 	s.mock.ExpectQuery(sql).WillReturnRows(rows)
 
@@ -128,7 +121,7 @@ func (s *GameTestSuite) TestGameRepo_Get_OneValidRow() {
 		Title:  "Rocket League",
 		Publisher: "Psyonix",
 		Developer: "Psyonix",
-		ReleaseDate: getDate("2015-07-07"),
+		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 
 	assert.Equal(s.T(), expected, game)
@@ -162,7 +155,7 @@ func (s *GameTestSuite) TestGameRepo_Update_NotExist() {
 //Test for updating an existing game
 func (s *GameTestSuite) TestGameRepo_Update_Exists() {
 	selectRows := sqlmock.NewRows([]string{"id", "title", "developer", "publisher", "releaseDate"}).
-		AddRow(1, "Rocket League", "Psyonix", "Psyonix", getDate("2015-07-07"))
+		AddRow(1, "Rocket League", "Psyonix", "Psyonix", utils.GetDate("2015-07-07"))
 	const sqlSelect = `SELECT`
 	s.mock.ExpectQuery(sqlSelect).WillReturnRows(selectRows)
 	const sqlUpdate = `UPDATE`
@@ -174,7 +167,7 @@ func (s *GameTestSuite) TestGameRepo_Update_Exists() {
 		Title:  "Rocket League",
 		Publisher: "Psyonix",
 		Developer: "Psyonix",
-		ReleaseDate: getDate("2015-07-07"),
+		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	game, err := s.repository.Update(expected)
 	require.True(s.T(), err == nil)
@@ -191,7 +184,7 @@ func (s *GameTestSuite) TestGameRepo_Insert_Succeeds() {
 		Title:  "Rocket League",
 		Publisher: "Psyonix",
 		Developer: "Psyonix",
-		ReleaseDate: getDate("2015-07-07"),
+		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	created, err := s.repository.Create(expected)
 
@@ -214,7 +207,7 @@ func (s *GameTestSuite) TestGameRepo_Insert_Fails() {
 		Title:  "dev",
 		Publisher: "dev@test.com",
 		Developer: "Psyonix",
-		ReleaseDate: getDate("2015-07-07"),
+		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	created, err := s.repository.Create(input)
 
@@ -225,7 +218,7 @@ func (s *GameTestSuite) TestGameRepo_Insert_Fails() {
 //Test for deleting an existing game
 func (s *GameTestSuite) TestGameRepo_Delete_Succeeds() {
 	selectRows := sqlmock.NewRows([]string{"id", "title", "developer", "publisher", "releaseDate"}).
-		AddRow(1, "Rocket League", "Psyonix", "Psyonix", getDate("2015-07-07"))
+		AddRow(1, "Rocket League", "Psyonix", "Psyonix", utils.GetDate("2015-07-07"))
 	s.mock.ExpectQuery(`SELECT`).WillReturnRows(selectRows)
 
 	s.mock.ExpectBegin()
@@ -249,7 +242,7 @@ func (s *GameTestSuite) TestGameRepo_Delete_NotExist() {
 func (s *GameTestSuite) TestGameRepo_Delete_Fails() {
 	expectedErr := errorUtils.NewEntityError(errorUtils.NewError("delete_failed"))
 	selectRows := sqlmock.NewRows([]string{"id", "title", "developer", "publisher", "releaseDate"}).
-		AddRow(1, "Rocket League", "Psyonix", "Psyonix", getDate("2015-07-07"))
+		AddRow(1, "Rocket League", "Psyonix", "Psyonix", utils.GetDate("2015-07-07"))
 	s.mock.ExpectQuery(`SELECT`).WillReturnRows(selectRows)
 
 	s.mock.ExpectBegin()

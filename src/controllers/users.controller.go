@@ -42,7 +42,7 @@ func GetAllUsers(c *gin.Context) {
 
 func CreateUser(c *gin.Context) {
 	var user domain.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&user); user.Validate() != nil || err != nil {
 		userErr := errorUtils.NewUnprocessableEntityError("invalid json body")
 		c.JSON(userErr.Status(), userErr)
 		return
@@ -63,7 +63,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	var user domain.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&user); user.Validate() != nil || err != nil {
 		userErr := errorUtils.NewUnprocessableEntityError("invalid json body")
 		c.JSON(userErr.Status(), userErr)
 		return
