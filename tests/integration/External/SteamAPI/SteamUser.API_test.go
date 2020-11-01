@@ -17,7 +17,7 @@ func TestSteamUserAPITestSuite(t *testing.T){
 }
 
 func (s *SteamUserAPITestSuite) SetupSuite(){
-	integration.LoadEnv()
+	integration.SimulateEnv()
 }
  
 func (s *SteamUserAPITestSuite) BeforeTest(_, _ string){
