@@ -36,6 +36,10 @@ func (g *gamesService) GetAllGames() ([]domain.Game, errorUtils.EntityError) {
 }
 
 func (g *gamesService) CreateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
+	if err := game.Validate(); err != nil {
+		return nil, err
+	}
+
 	game, err := domain.GameRepo.Create(game)
 	if err != nil {
 		return nil, err
@@ -44,7 +48,11 @@ func (g *gamesService) CreateGame(game *domain.Game) (*domain.Game, errorUtils.E
 }
 
 func (g *gamesService) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
-	current, err := domain.GameRepo.Get(uint64(game.ID))
+	if err := game.Validate(); err != nil {
+		return nil, err
+	}
+
+	current, err := domain.GameRepo.Get(game.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +74,7 @@ func (g *gamesService) DeleteGame(gameId uint64) errorUtils.EntityError {
 		return err
 	}
 
-	deleteErr := domain.GameRepo.Delete(uint64(game.ID))
+	deleteErr := domain.GameRepo.Delete(game.ID)
 	if deleteErr != nil {
 		return deleteErr
 	}
