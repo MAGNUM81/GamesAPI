@@ -1,0 +1,47 @@
+user:
+  user:
+    create:
+      allow: false
+    read:
+      allow: true
+      #user can only update its own User entity (email, name)
+    update:
+      allow: true
+      ensure:
+        query:
+          - key: email
+            operator: "="
+            value: "ctx.email"
+    delete:
+      allow: false
+      
+  game:
+    create:
+      allow: false
+    read:
+      allow:true
+    update:
+      allow: false
+    delete:
+      allow: false
+#admin can do anything
+admin:
+  user:
+    create:
+      allow: true
+    read:
+      allow: true
+    update:
+      allow: true
+    delete:
+      allow: true
+  game:
+    create:
+      allow: true
+    read:
+      allow: true
+    update:
+      allow: true
+    delete:
+      allow: true
+    
