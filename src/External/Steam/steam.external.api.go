@@ -8,6 +8,16 @@ import (
 	"os"
 )
 
+var (
+	ExternalSteamUserService ExternalSteamUserServiceInterface = &externalSteamUserService{}
+)
+
+type externalSteamUserService struct {}
+
+
+type ExternalSteamUserServiceInterface interface {
+	GetUserID(personalURL string) (string, error)
+}
 
 func getFromSteam(requestURL string) ([]byte, error){
 	resp, err := http.Get(requestURL)
@@ -17,7 +27,7 @@ func getFromSteam(requestURL string) ([]byte, error){
 	return bodyBytes, err
 }
 
-func GetUserID(personalURL string) (string, error) {
+func (e externalSteamUserService) GetUserID(personalURL string) (string, error) {
 	type basicUser struct {
 		Response struct {
 			Steamid string `json:"steamid"`
@@ -38,4 +48,3 @@ func GetUserID(personalURL string) (string, error) {
 		return "",  errors.New("no match found")
 	}
 }
-
