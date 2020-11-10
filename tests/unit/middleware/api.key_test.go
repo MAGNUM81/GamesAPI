@@ -4,6 +4,7 @@ import (
 	"GamesAPI/src/middleware"
 	"GamesAPI/src/services"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/assert/v2"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
@@ -16,15 +17,15 @@ type tokenServiceMock struct {
 	validateToken func(string)(bool, error)
 }
 
-func (t tokenServiceMock) SetValidateToken(f func(string) (bool, error)) {
+func (t *tokenServiceMock) SetValidateToken(f func(string) (bool, error)) {
 	t.validateToken = f
 }
 
-func (t tokenServiceMock) GetApiToken() (token string, err error) {
+func (t *tokenServiceMock) GetApiToken() (token string, err error) {
 	return  "1234",nil
 }
 
-func (t tokenServiceMock) ValidateToken(s string) (token bool, err error) {
+func (t *tokenServiceMock) ValidateToken(s string) (token bool, err error) {
 	return t.validateToken(s)
 }
 
@@ -33,6 +34,10 @@ type TestMiddlewareApiTokenSuite struct {
 	mockService TokenServiceMockInterface
 	r *gin.Engine
 	rr *httptest.ResponseRecorder
+}
+
+func BidonHandler(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"Error": "None"})
 }
 
 func (t *TestMiddlewareApiTokenSuite) BeforeTest(_, _ string) {
@@ -50,6 +55,7 @@ func (t *TestMiddlewareApiTokenSuite) SetupSuite() {
 	services.TokenService = mock  //set this so the tested code calls the swapped methods
 	t.r = gin.Default()
 	t.r.Use(middleware.MiddlewareHandler)
+	t.r.GET("/", BidonHandler)
 
 }
 
@@ -59,7 +65,6 @@ func (t *TestMiddlewareApiTokenSuite) SetupSuite() {
 func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_TokenValid(){
 	t.mockService.SetValidateToken(func(string) (bool, error){
 		return  true , nil
-
 	})
 
 	//1. api token - n'importe quelle valeur string
@@ -69,6 +74,11 @@ func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_Token
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("api_token",tokenApi)
 	t.r.ServeHTTP(t.rr,req)
+
+	assert.Equal(t.T(), http.StatusOK, t.rr.Code)
+	//assert.Equal(t.T(), "None", potentialError)
+	//assert.NotEqual(t.T(), "API token required", potentialError)
+
 	//3. "s'envoyer" la requête - semblable à s.r.ServeHTTP(s.rr, req)
 	//3.1 s.r : *gin.Engine
 	//3.2 s.rr : *httptest.ResponseRecorder

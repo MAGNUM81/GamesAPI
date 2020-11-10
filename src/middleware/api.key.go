@@ -22,10 +22,10 @@ func ErrorMessageTypeCode(c *gin.Context, code int, message interface{}) {
 func MiddlewareHandler(c *gin.Context) {
 	/// token := c.Request.FormValue("api_token") //.header
 
-		token := c.Request.FormValue("api_token")
+		token := c.Request.Header.Get("api_token")
 
 		if token == "" {
-			ErrorMessageTypeCode(c, 401, "API token required")
+			ErrorMessageTypeCode(c, 400, "API token required")
 			return
 		}
 		resultValidate, err := services.TokenService.ValidateToken(token)
@@ -40,5 +40,4 @@ func MiddlewareHandler(c *gin.Context) {
 		}
 
 		c.Next()
-
 }
