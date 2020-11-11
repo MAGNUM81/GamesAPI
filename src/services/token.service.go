@@ -27,8 +27,6 @@ func (t apiTokenservice) GetApiToken()( token string, err error){
 
 	return "" ,errors.New("Environment  Api key Token is not find.")
 
-
-
 }
 
 func  (t apiTokenservice) ValidateToken(tokenHeader string)( validation bool, err error){

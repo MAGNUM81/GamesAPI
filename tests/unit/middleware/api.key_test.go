@@ -3,8 +3,9 @@ package middleware
 import (
 	"GamesAPI/src/middleware"
 	"GamesAPI/src/services"
+	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
@@ -59,34 +60,64 @@ func (t *TestMiddlewareApiTokenSuite) SetupSuite() {
 
 }
 
-
-//Test identitfaction Token
-//this test is a correct api token
 func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_TokenValid(){
 	t.mockService.SetValidateToken(func(string) (bool, error){
 		return  true , nil
 	})
 
-	//1. api token - n'importe quelle valeur string
 	 tokenApi := "1234"
-	//2. nouvelle requête http semblable à http.NewRequest(http.MethodGet, "/", nil)
-	//2.1 mettre api token dans header de la requête - google it
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("api_token",tokenApi)
 	t.r.ServeHTTP(t.rr,req)
 
 	assert.Equal(t.T(), http.StatusOK, t.rr.Code)
-	//assert.Equal(t.T(), "None", potentialError)
-	//assert.NotEqual(t.T(), "API token required", potentialError)
+	assert.NotEqual(t.T(), 400, t.rr.Code)
+	assert.NotEqual(t.T(), 401, t.rr.Code)
+	assert.NotEqual(t.T(), 500, t.rr.Code)
+}
+func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_MissingToken(){
+	t.mockService.SetValidateToken(func(string) (bool, error){
+		return  false , nil
+	})
 
-	//3. "s'envoyer" la requête - semblable à s.r.ServeHTTP(s.rr, req)
-	//3.1 s.r : *gin.Engine
-	//3.2 s.rr : *httptest.ResponseRecorder
-	//3.3 ne pas oublier de les initialiser
-	//SetupSuite -> s.r = gin.Default()
-	//3.4 r.GET("/", middleware.MiddlewareHandler)
-	//BeforeTest -> s.rr = httptest.NewRecorder()
+	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	t.r.ServeHTTP(t.rr,req)
+
+	assert.Equal(t.T(), 400, t.rr.Code)
+	assert.NotEqual(t.T(), 500, t.rr.Code)
+	assert.NotEqual(t.T(), 401, t.rr.Code)
+	assert.NotEqual(t.T(), http.StatusOK, t.rr.Code)
+}
+
+func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_ErrorValidationToken(){
+	t.mockService.SetValidateToken(func(string) (bool, error){
+		return  true , errors.New("Environment  Api key Token is not find.")
+	})
+	tokenApi := "1245"
+	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Add("api_token",tokenApi)
+	t.r.ServeHTTP(t.rr,req)
+
+	assert.Equal(t.T(), 500, t.rr.Code)
+	assert.NotEqual(t.T(), 400, t.rr.Code)
+	assert.NotEqual(t.T(), 401, t.rr.Code)
+	assert.NotEqual(t.T(), http.StatusOK, t.rr.Code)
 
 
+}
+
+func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_InvalidToken(){
+	t.mockService.SetValidateToken(func(string) (bool, error){
+		return  false , nil
+	})
+	tokenApi := "1245"
+	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Add("api_token",tokenApi)
+	t.r.ServeHTTP(t.rr,req)
+
+	assert.Equal(t.T(), 401, t.rr.Code)
+	assert.NotEqual(t.T(), 400, t.rr.Code)
+	assert.NotEqual(t.T(), 500, t.rr.Code)
+	assert.NotEqual(t.T(), http.StatusOK, t.rr.Code)
 
 }
