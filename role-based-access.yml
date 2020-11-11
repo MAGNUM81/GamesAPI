@@ -19,7 +19,7 @@ user:
     create:
       allow: false
     read:
-      allow:true
+      allow: true
     update:
       allow: false
     delete:

@@ -9,15 +9,62 @@ import (
 	"testing"
 )
 
-type rbacTestSuite struct {
+type rbacRuleTestSuite struct {
 	suite.Suite
 }
 
-func TestRbacTestSuite(t *testing.T) {
-	suite.Run(t, new(rbacTestSuite))
+func TestRbacRuleTestSuite(t *testing.T) {
+	suite.Run(t, new(rbacRuleTestSuite))
 }
 
-func (s *rbacTestSuite) TestRule_FromContext() {
+//strongly inspired from https://dev.to/bastianrob/rbac-in-rest-api-using-go-5gg0
+func (s *rbacRuleTestSuite) TestRule_Comply() {
+	type args struct {
+		expected interface{}
+		actual   interface{}
+	}
+	tests := []struct {
+		given string
+		then  string
+		rule  domain.Rule
+		args  args
+		want  bool
+	}{{
+		given: "With rule: actual must be = expected", then: "query complies with our rule",
+		rule: domain.Rule{
+			Operator: "=",
+		},
+		args: args{
+			expected: "something",
+			actual:   "something",
+		},
+		want: true,
+	}, {
+		given: "With rule: actual must be != expected", then: "query complies with our rule",
+		rule: domain.Rule{
+			Operator: "!=",
+		},
+		args: args{
+			expected: "something",
+			actual:   "another",
+		},
+		want: true,
+	}, {
+		given: "With rule operator not known", then: "query does not comply",
+		rule: domain.Rule{
+			Operator: "unknown",
+		},
+		want: false,
+	}}
+	for _, tt := range tests {
+		s.T().Run(tt.given, func(t *testing.T) {
+			got := tt.rule.Comply(tt.args.expected, tt.args.actual)
+			assert.Equal(t, tt.want, got, tt.then)
+		})
+	}
+}
+
+func (s *rbacRuleTestSuite) TestRule_FromContext() {
 	tests := []struct {
 		given     string
 		then      string

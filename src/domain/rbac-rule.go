@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"reflect"
 	"strings"
 )
 
@@ -13,6 +14,18 @@ type Rule struct {
 }
 
 //Strongly inspired from https://dev.to/bastianrob/rbac-in-rest-api-using-go-5gg0
+func (rule Rule) Comply(expected, actual interface{}) bool {
+	switch rule.Operator {
+	case "!=":
+		return !reflect.DeepEqual(expected, actual)
+	case "=":
+		return reflect.DeepEqual(expected, actual)
+	}
+
+	// doesn't comply if we don't recognize the rule operator
+	return false
+}
+
 func (rule Rule) FromContext(ctx context.Context) (interface{}, error) {
 	if !strings.HasPrefix(rule.Value, "ctx") {
 		return rule.Value, nil
