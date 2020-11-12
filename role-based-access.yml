@@ -9,9 +9,9 @@ user:
       allow: true
       ensure:
         query:
-          - key: email
+          - key: userId
             operator: "="
-            value: "ctx.email"
+            value: "ctx.userId"
     delete:
       allow: false
       

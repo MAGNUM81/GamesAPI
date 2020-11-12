@@ -3,8 +3,7 @@ package domain
 type contextKey string
 
 var (
-	contextKeyRbacEmail = contextKey("rbac.email")
-	contextKeyRbacAccess = contextKey("rbac.access")
+	contextKeyRbacUserId = contextKey("rbac.userId")
 )
 
 func (c contextKey) String() string {
@@ -15,10 +14,6 @@ func ContextKey(s string) string {
 	return contextKey(s).String()
 }
 
-func RbacEmail() string {
-	return contextKeyRbacEmail.String()
-}
-
-func RbacAccess() string {
-	return contextKeyRbacAccess.String()
+func RbacUserId() string {
+	return contextKeyRbacUserId.String()
 }

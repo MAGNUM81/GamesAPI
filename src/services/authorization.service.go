@@ -5,11 +5,10 @@ import (
 	"GamesAPI/src/utils/errorUtils"
 	"context"
 	"net/url"
-	"os"
 )
 
 var (
-	AuthorizationService AuthorizationServiceInterface = NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
+	AuthorizationService AuthorizationServiceInterface = &authorizationService{}
 )
 
 type AuthorizationServiceInterface interface {
