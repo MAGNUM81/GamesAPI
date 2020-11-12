@@ -3,6 +3,7 @@ package api
 import (
 	"GamesAPI/src/database"
 	"GamesAPI/src/domain"
+	"GamesAPI/src/middleware"
 	"GamesAPI/src/router"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,8 @@ func Bootstrap(r *gin.Engine) {
 		panic(fmt.Errorf("database connection could not be instantiated %s", dbErr.Error()))
 	}
 	defer dbInstance.Close()
+
+	middleware.InitApiToken(r)
 	router.InitRoutes(r)
 
 	err := r.Run()
