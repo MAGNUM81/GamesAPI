@@ -6,10 +6,12 @@ import (
 	"GamesAPI/src/utils/errorUtils"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"os"
 	"strings"
 )
 
 func InitAuthorization(r *gin.Engine) {
+	services.AuthorizationService = services.NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
 	r.Use(AuthorizationHandler)
 }
 

@@ -7,12 +7,16 @@ import (
 	"net/url"
 )
 
+//Tests were strongly inspired from https://dev.to/bastianrob/rbac-in-rest-api-using-go-5gg0
+//They cover way more cases than our current needs
+
 var (
 	AuthorizationService AuthorizationServiceInterface = &authorizationService{}
 )
 
 type AuthorizationServiceInterface interface {
 	Authorize(ctx context.Context, url *url.URL, role string, resource string, endpoint string) error
+	GetRbac() domain.RBAC
 }
 
 type authorizationService struct {
@@ -46,12 +50,16 @@ func (a authorizationService) Authorize(ctx context.Context, url *url.URL, role 
 		return err
 	}
 
-	err = permission.Ensure.QueryComplies(ctx, url)
+	err = permission.Enforce.QueryComplies(ctx, url)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (a authorizationService) GetRbac() domain.RBAC {
+	return a.rbac
 }
 
 
