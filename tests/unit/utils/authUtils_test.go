@@ -20,11 +20,12 @@ func TestAuthUtilsTestSuite(t *testing.T) {
 func (s *AuthUtilsTestSuite) TestJwtSymmetric() {
 	var userId uint64 = 1
 	expiresAt := time.Now().Unix()
-	jwtToken := authUtils.JwtCreate(userId, expiresAt)
+	jwtToken, errCreate := authUtils.JwtCreate(userId, expiresAt)
+	assert.Nil(s.T(), errCreate)
 
-	deserializedJwtToken, _ := authUtils.JwtDecode(jwtToken)
+	deserializedJwtToken, errDecode := authUtils.JwtDecode(jwtToken)
 	claims := deserializedJwtToken.Claims.(*authUtils.UserClaims)
-
+	assert.Nil(s.T(), errDecode)
 	assert.Equal(s.T(), userId, claims.UserId)
 	assert.Equal(s.T(), expiresAt, claims.ExpiresAt)
 }

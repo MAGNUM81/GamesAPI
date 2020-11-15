@@ -17,7 +17,7 @@ func JwtDecode(token string) (*jwt.Token, error) {
 	})
 }
 
-func JwtCreate(userID uint64, expiredAt int64) string {
+func JwtCreate(userID uint64, expiredAt int64) (string, error) {
 	claims := UserClaims{
 		userID,
 		jwt.StandardClaims{
@@ -26,6 +26,5 @@ func JwtCreate(userID uint64, expiredAt int64) string {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, _ := token.SignedString(superSecretString)
-	return ss
+	return token.SignedString(superSecretString)
 }
