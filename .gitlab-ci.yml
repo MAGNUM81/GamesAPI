@@ -32,6 +32,8 @@ compile:
 testing:
   stage: test
   script:
-    - cd $GOPATH/src/$REPO_NAME/tests
+#Will only run unit test. This is volontary please be sure not to run External API test
+#if you change paths.   
+    - cd $GOPATH/src/$REPO_NAME/tests/unit
 #This line make the runner check into sub-directory to run test recursively
     - go test ./...
