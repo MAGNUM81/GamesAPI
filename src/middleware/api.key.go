@@ -15,7 +15,7 @@ func InitApiToken(r *gin.Engine){
 
 // Message Contexte Error
 func ErrorMessageTypeCode(c *gin.Context, code int, message interface{}) {
-	c.AbortWithStatusJSON(code, gin.H{"Error : ": message})
+	c.AbortWithStatusJSON(code, gin.H{"Error": message})
 }
 
 //Token  Authentificator  handler
