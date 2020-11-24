@@ -29,9 +29,11 @@ func AuthorizationHandler(c *gin.Context) {
 	roles, err := services.UserRoleService.GetRolesByUserID(userId)
 	if err != nil {
 		handleAuthError(c, err.Status(), err)
+		return
 	}
 	if len(roles) < 1 {
 		handleAuthError(c, 500, errorUtils.ErrNoRole)
+		return
 	}
 	//Typically, each user has only one role, so we'll take the first one we get
 	roleName := roles[0].Name
@@ -39,18 +41,24 @@ func AuthorizationHandler(c *gin.Context) {
 	//2. Determine which resource we're trying to access
 	url := c.Request.URL
 	resource, resourceErr := extractResource(url.Path)
-	handleAuthError(c, 400, resourceErr)
+	if resourceErr != nil {
+		handleAuthError(c, 400, resourceErr)
+		return
+	}
 
 	//3. Determine which endpoint we're trying to access
 	httpMethod := c.Request.Method
 	endpoint, endpointErr := extractEndpoint(httpMethod)
-	handleAuthError(c, 400, endpointErr)
+	if endpointErr != nil {
+		handleAuthError(c, 400, endpointErr)
+		return
+	}
 
 	//4. Authorize the request using all the info provided
 	authErr := services.AuthorizationService.Authorize(ctx, url, roleName, resource, endpoint)
-
 	if authErr != nil {
-		handleAuthError(c, 500, authErr)
+		handleAuthError(c, 403, authErr)
+		return
 	}
 
 	c.Next()

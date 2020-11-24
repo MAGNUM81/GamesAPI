@@ -34,7 +34,7 @@ func NewAuthorizationService(path string) *authorizationService {
 	return ret
 }
 
-func (a authorizationService) Authorize(ctx context.Context, url *url.URL, role string, resource string, endpoint string) error {
+func (a *authorizationService) Authorize(ctx context.Context, url *url.URL, role string, resource string, endpoint string) error {
 	permission, exists := a.rbac[role][resource][endpoint]
 
 	if !exists {
@@ -58,7 +58,7 @@ func (a authorizationService) Authorize(ctx context.Context, url *url.URL, role 
 	return nil
 }
 
-func (a authorizationService) GetRbac() domain.RBAC {
+func (a *authorizationService) GetRbac() domain.RBAC {
 	return a.rbac
 }
 
