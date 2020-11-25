@@ -5,6 +5,7 @@ import (
 	"GamesAPI/tests/unit/mocks"
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
 )
 
 type UserSessionServiceTestSuite struct {
@@ -22,27 +23,44 @@ func (s *UserSessionServiceTestSuite) SetupSuite() {
 	domain.UserSessionRepo = mock
 }
 
-func (s *UserSessionServiceTestSuite) TestCreateToken_Success() {
+var (
+	testTime = time.Now()
+	testUserId = uint64(42)
+)
+
+func (s *UserSessionServiceTestSuite) TestGenerateSessionToken_Success() {
+	
+}
+
+func (s *UserSessionServiceTestSuite) TestGenerateSessionToken_Failure() {
 
 }
 
-func (s *UserSessionServiceTestSuite) TestCreateToken_Failure(){
+func (s *UserSessionServiceTestSuite) TestCreateSession_Success() {
+	s.mockRepo.SetExists(func(key string) bool {
+		return true
+	})
+}
+
+func (s *UserSessionServiceTestSuite) TestCreateSession_Failure(){
+	s.mockRepo.SetExists(func(key string) bool {
+		return false
+	})
+}
+
+func (s *UserSessionServiceTestSuite) TestGetSession_Success(){
 
 }
 
-func (s *UserSessionServiceTestSuite) TestGetToken_Success(){
+func (s *UserSessionServiceTestSuite) TestGetSession_Failure(){
 
 }
 
-func (s *UserSessionServiceTestSuite) TestGetToken_Failure(){
+func (s *UserSessionServiceTestSuite) TestDeleteSession_Success(){
 
 }
 
-func (s *UserSessionServiceTestSuite) TestDeleteToken_Success(){
-
-}
-
-func (s *UserSessionServiceTestSuite) TestDeleteToken_Failure(){
+func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure(){
 
 }
 
