@@ -18,8 +18,10 @@ type UserSessionServiceInterface interface {
 	CreateSession(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError)
 	ExistsSession(token string) bool
 	DeleteSession(token string) errorUtils.EntityError
+	IsSessionExpired(key string, currentTime time.Time) (bool, errorUtils.EntityError)
 	GenerateSessionToken(userId uint64, expireAt time.Time) (string, error)
 }
+
 
 type userSessionService struct {}
 
@@ -51,6 +53,20 @@ func (u userSessionService) CreateSession(token *domain.UserSession) (*domain.Us
 	}
 
 	return ret, err
+}
+
+func (u userSessionService) IsSessionExpired(key string, currentTime time.Time) (bool, errorUtils.EntityError) {
+	if !domain.UserSessionRepo.Exists(key) {
+		return true, errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", key))
+	}
+
+	sesh, err := domain.UserSessionRepo.Get(key)
+
+	if err != nil {
+		return true, err
+	}
+
+	return sesh.ExpiresAt < currentTime.UnixNano(), nil
 }
 
 func (u userSessionService) ExistsSession(key string) bool {
