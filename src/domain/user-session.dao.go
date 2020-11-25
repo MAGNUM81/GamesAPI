@@ -17,7 +17,7 @@ type userSessionRepo struct {
 	repo map[string]*UserSession
 }
 
-func (u userSessionRepo) Get(key string) (*UserSession, errorUtils.EntityError) {
+func (u *userSessionRepo) Get(key string) (*UserSession, errorUtils.EntityError) {
 	user := u.repo[key]
 	var err errorUtils.EntityError = nil
 	if user == nil {
@@ -26,17 +26,17 @@ func (u userSessionRepo) Get(key string) (*UserSession, errorUtils.EntityError) 
 	return user, err
 }
 
-func (u userSessionRepo) Create(key string, token *UserSession) (*UserSession, errorUtils.EntityError) {
+func (u *userSessionRepo) Create(key string, token *UserSession) (*UserSession, errorUtils.EntityError) {
 	u.repo[key] = token
 	return token, nil
 }
 
-func (u userSessionRepo) Delete(key string) errorUtils.EntityError {
+func (u *userSessionRepo) Delete(key string) errorUtils.EntityError {
 	u.repo[key] = nil
 	return nil
 }
 
-func (u userSessionRepo) Exists(key string) bool {
+func (u *userSessionRepo) Exists(key string) bool {
 	return u.repo[key] != nil
 }
 
