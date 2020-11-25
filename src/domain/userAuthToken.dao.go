@@ -3,20 +3,21 @@ package domain
 import "GamesAPI/src/utils/errorUtils"
 
 var (
-	UserAuthTokenRepo UserAuthTokenRepoInterface = NewUserAuthTokenRepository())
+	UserSessionRepo UserSessionRepoInterface = NewUserAuthTokenRepository()
+	)
 
-type UserAuthTokenRepoInterface interface {
-	Get(key string) (*UserAuthToken, errorUtils.EntityError)
-	Create(key string, token *UserAuthToken) (*UserAuthToken, errorUtils.EntityError)
+type UserSessionRepoInterface interface {
+	Get(key string) (*UserSession, errorUtils.EntityError)
+	Create(key string, token *UserSession) (*UserSession, errorUtils.EntityError)
 	Delete(key string) errorUtils.EntityError
 	Exists(key string) bool
 }
 
-type userAuthTokenRepo struct {
-	repo map[string]*UserAuthToken
+type userSessionRepo struct {
+	repo map[string]*UserSession
 }
 
-func (u userAuthTokenRepo) Get(key string) (*UserAuthToken, errorUtils.EntityError) {
+func (u userSessionRepo) Get(key string) (*UserSession, errorUtils.EntityError) {
 	user := u.repo[key]
 	var err errorUtils.EntityError = nil
 	if user == nil {
@@ -25,22 +26,22 @@ func (u userAuthTokenRepo) Get(key string) (*UserAuthToken, errorUtils.EntityErr
 	return user, err
 }
 
-func (u userAuthTokenRepo) Create(key string, token *UserAuthToken) (*UserAuthToken, errorUtils.EntityError) {
+func (u userSessionRepo) Create(key string, token *UserSession) (*UserSession, errorUtils.EntityError) {
 	u.repo[key] = token
 	return token, nil
 }
 
-func (u userAuthTokenRepo) Delete(key string) errorUtils.EntityError {
+func (u userSessionRepo) Delete(key string) errorUtils.EntityError {
 	u.repo[key] = nil
 	return nil
 }
 
-func (u userAuthTokenRepo) Exists(key string) bool {
+func (u userSessionRepo) Exists(key string) bool {
 	return u.repo[key] != nil
 }
 
-func NewUserAuthTokenRepository() UserAuthTokenRepoInterface{
-	return &userAuthTokenRepo{repo: map[string]*UserAuthToken{}}
+func NewUserAuthTokenRepository() UserSessionRepoInterface {
+	return &userSessionRepo{repo: map[string]*UserSession{}}
 }
 
 

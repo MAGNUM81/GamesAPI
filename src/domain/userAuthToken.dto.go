@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-type UserAuthToken struct {
+type UserSession struct {
 	Token string `json:"token"`
 	UserId uint64 `json:"user_id"`
 	ExpiresAt int64 `json:"expires_at"`
 }
 
-func (t *UserAuthToken) Validate() errorUtils.EntityError {
+func (t *UserSession) Validate() errorUtils.EntityError {
 	if strings.Trim(t.Token, " ") == "" {
 		return errorUtils.NewUnprocessableEntityError("Token cannot be empty")
 	}

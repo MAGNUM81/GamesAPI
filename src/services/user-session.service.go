@@ -15,7 +15,7 @@ var (
 )
 
 type UserSessionServiceInterface interface {
-	CreateSession(token *domain.UserAuthToken) (*domain.UserAuthToken, errorUtils.EntityError)
+	CreateSession(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError)
 	ExistsSession(token string) bool
 	DeleteSession(token string) errorUtils.EntityError
 	GenerateSessionToken(userId uint64, expireAt time.Time) (string, error)
@@ -36,16 +36,16 @@ func (u userSessionService) GenerateSessionToken(userId uint64, expireAt time.Ti
 	return strconv.Itoa(int(h.Sum32())), err
 }
 
-func (u userSessionService) CreateSession(token *domain.UserAuthToken) (*domain.UserAuthToken, errorUtils.EntityError) {
+func (u userSessionService) CreateSession(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError) {
 	if err := token.Validate(); err != nil {
 		return nil, err
 	}
 
-	if domain.UserAuthTokenRepo.Exists(token.Token){
+	if domain.UserSessionRepo.Exists(token.Token){
 		return nil, errorUtils.NewUnprocessableEntityError(fmt.Sprintf("token with key %s already exists", token.Token))
 	}
 
-	ret, err := domain.UserAuthTokenRepo.Create(token.Token, token)
+	ret, err := domain.UserSessionRepo.Create(token.Token, token)
 	if err != nil {
 		return nil, err
 	}
@@ -54,12 +54,12 @@ func (u userSessionService) CreateSession(token *domain.UserAuthToken) (*domain.
 }
 
 func (u userSessionService) ExistsSession(key string) bool {
-	return domain.UserAuthTokenRepo.Exists(key)
+	return domain.UserSessionRepo.Exists(key)
 }
 
 func (u userSessionService) DeleteSession(key string) errorUtils.EntityError {
-	if !domain.UserAuthTokenRepo.Exists(key) {
+	if !domain.UserSessionRepo.Exists(key) {
 		return errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", key))
 	}
-	return domain.UserAuthTokenRepo.Delete(key)
+	return domain.UserSessionRepo.Delete(key)
 }
