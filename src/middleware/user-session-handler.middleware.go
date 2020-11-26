@@ -10,6 +10,12 @@ import (
 )
 
 func UserSessionHandler(c *gin.Context) {
+	authHeader := c.Request.Header["Authorization"]
+	if len(authHeader) < 1 {
+		err := errorUtils.NewBadRequestError("Authorization header was not set properly.")
+		AbortWithError(c, err.Status(), err.Message())
+		return
+	}
 	reqToken := strings.Trim(c.Request.Header["Authorization"][0], " ")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	if len(splitToken) < 2 {
