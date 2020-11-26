@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+func InitUserSessionHandler(r *gin.Engine) {
+	r.Use(UserSessionHandler)
+}
+
 func UserSessionHandler(c *gin.Context) {
 	authHeader := c.Request.Header["Authorization"]
 	if len(authHeader) < 1 {

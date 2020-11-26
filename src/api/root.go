@@ -20,7 +20,8 @@ func Bootstrap(r *gin.Engine) {
 	}
 	defer dbInstance.Close()
 
-	middleware.InitApiToken(r)
+	middleware.InitApiToken(r) //this middleware should cover all routes without exception.
+	middleware.InitUserSessionHandler(r) //this middleware should cover all routes but /auth
 	router.InitRoutes(r)
 
 	err := r.Run()
