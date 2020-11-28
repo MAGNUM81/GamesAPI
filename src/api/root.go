@@ -5,6 +5,7 @@ import (
 	"GamesAPI/src/domain"
 	"GamesAPI/src/middleware"
 	"GamesAPI/src/router"
+	"GamesAPI/src/services"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
