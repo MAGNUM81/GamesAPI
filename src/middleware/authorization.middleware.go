@@ -90,8 +90,7 @@ func extractEndpoint(httpMethod string) (string, error) {
 		ret = "update"
 	case "DELETE":
 		ret = "delete"
-	}
-	if ret == "" {
+	default:
 		err = errors.New("endpoint does not exist")
 	}
 	return ret, err
