@@ -13,7 +13,7 @@ type User struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 	Name string  `gorm:"column:name;not null;" json:"name"`
 	Email string `gorm:"column:email;not null;unique" json:"email"`
-	PasswordHash string `gorm:"column:password_hash;not null" json:"password_hash"`
+	PasswordHash string `gorm:"column:password_hash;not null;default:'hashpass'" json:"password_hash"`
 }
 
 func (u *User) Validate() errorUtils.EntityError {
