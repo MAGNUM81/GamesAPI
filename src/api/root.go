@@ -8,6 +8,7 @@ import (
 	"GamesAPI/src/services"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"os"
 	"time"
 )
 
@@ -22,6 +23,9 @@ func Bootstrap(r *gin.Engine) {
 	}
 	defer dbInstance.Close()
 
+	services.AuthorizationService = services.NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
+
+	//middleware.InitAuthorization(r) need authentication layer for authorization layer to make sense
 	middleware.InitApiToken(r) //this middleware should cover all routes without exception.
 	middleware.InitUserSessionHandler(r) //this middleware should cover all routes but /auth
 	//let's add a Session that doesn't expire for devs
