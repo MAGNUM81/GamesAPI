@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitAllGameRoutes(r *gin.Engine) {
-	g := InitGameRouterGroup(r)
+func InitAllGameRoutes(root *gin.RouterGroup) {
+	g := InitGameRouterGroup(root)
 	InitGetAllGamesRoute(g)
 	InitGetGameRoute(g)
 	InitCreateGameRoute(g)
@@ -14,8 +14,8 @@ func InitAllGameRoutes(r *gin.Engine) {
 	InitDeleteGameRoute(g)
 }
 
-func InitGameRouterGroup(r *gin.Engine) *gin.RouterGroup {
-	return r.Group("/games")
+func InitGameRouterGroup(g *gin.RouterGroup) *gin.RouterGroup {
+	return g.Group("/games")
 }
 
 func InitGetAllGamesRoute(g *gin.RouterGroup) {

@@ -18,9 +18,10 @@ import (
 
 type UserControllerTestSuite struct {
 	suite.Suite
-	mockService mocks.UserServiceMockInterface
-	r *gin.Engine
-	rr *httptest.ResponseRecorder
+	mockUserRoleService mocks.UserRoleServiceMockInterface
+	mockUserService mocks.UserServiceMockInterface
+	r               *gin.Engine
+	rr              *httptest.ResponseRecorder
 
 }
 
@@ -29,11 +30,15 @@ func TestUsersControllerTestSuite(t *testing.T){
 }
 
 func (s *UserControllerTestSuite) SetupSuite() {
-	mock := &mocks.UserServiceMock{}
-	s.mockService = mock
-	services.UsersService = mock
+	mockUsers := &mocks.UserServiceMock{}
+	mockUserRoles := &mocks.UserRoleMock{}
+	s.mockUserService = mockUsers
+	s.mockUserRoleService = mockUserRoles
+	services.UsersService = mockUsers
+	services.UserRoleService = mockUserRoles
+
 	s.r = gin.Default()
-	router.InitAllUserRoutes(s.r)
+	router.InitAllUserRoutes(s.r.Group(""))
 }
 
 func (s *UserControllerTestSuite) BeforeTest(_, _ string) {
@@ -41,7 +46,7 @@ func (s *UserControllerTestSuite) BeforeTest(_, _ string) {
 }
 
 func (s *UserControllerTestSuite) TestGetUser_Success() {
-	s.mockService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
 			ID:    1,
 			Name:  "dev",
@@ -78,7 +83,7 @@ func (s *UserControllerTestSuite) TestGetUser_InvalidId() {
 }
 
 func (s *UserControllerTestSuite) TestGetUser_NotFound() {
-	s.mockService.SetGetUser(func(u uint64) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetGetUser(func(u uint64) (*domain.User, errorUtils.EntityError) {
 		return nil, errorUtils.NewNotFoundError("user not found")
 	})
 	userIdParam := "1"
@@ -95,7 +100,7 @@ func (s *UserControllerTestSuite) TestGetUser_NotFound() {
 }
 
 func (s *UserControllerTestSuite) TestGetUser_DatabaseError() {
-	s.mockService.SetGetUser(func(u uint64) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetGetUser(func(u uint64) (*domain.User, errorUtils.EntityError) {
 		return nil, errorUtils.NewInternalServerError("database error")
 	})
 	userIdParam := "1"
@@ -112,14 +117,24 @@ func (s *UserControllerTestSuite) TestGetUser_DatabaseError() {
 }
 
 func (s *UserControllerTestSuite) TestCreateUser_Success() {
-	s.mockService.SetCreateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetCreateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
 			ID:    1,
 			Name:  "dev",
 			Email: "dev@test.com",
 		}, nil
 	})
-	jsonBody := `{"name":"dev", "email":"dev@test.com"}`
+
+	s.mockUserRoleService.SetCreateRole(func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError) {
+		return &domain.UserRole{
+			ID:        1,
+			UserID:    1,
+			Name:      "Admin",
+		}, nil
+	})
+
+	jsonBody := `{"name":"dev", "email":"dev@test.com", 
+					"password":"network7", "role":"Admin"}`
 	req, err := http.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -132,7 +147,7 @@ func (s *UserControllerTestSuite) TestCreateUser_Success() {
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
 	assert.EqualValues(t, http.StatusCreated, s.rr.Code)
-	assert.EqualValues(t, 1, user.ID)
+	assert.EqualValues(t, uint64(1), user.ID)
 	assert.EqualValues(t, "dev", user.Name)
 	assert.EqualValues(t, "dev@test.com", user.Email)
 }
@@ -170,7 +185,7 @@ func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonMissingField() {
 }
 
 func (s *UserControllerTestSuite) TestUpdateUser_Success() {
-	s.mockService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
 			ID: 1,
 			Name: "dev updated",
@@ -228,7 +243,7 @@ func (s *UserControllerTestSuite) TestUpdateUser_InvalidJson() {
 }
 
 func (s *UserControllerTestSuite) TestUpdateUser_ErrorUpdating() {
-	s.mockService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return nil, errorUtils.NewInternalServerError("error updating user")
 	})
 
@@ -250,7 +265,7 @@ func (s *UserControllerTestSuite) TestUpdateUser_ErrorUpdating() {
 }
 
 func (s *UserControllerTestSuite) TestDeleteUser_Success() {
-	s.mockService.SetDelete(func(u uint64) errorUtils.EntityError {
+	s.mockUserService.SetDelete(func(u uint64) errorUtils.EntityError {
 		return nil
 	})
 	id := "1"
@@ -285,7 +300,7 @@ func (s *UserControllerTestSuite) TestDeleteUser_InvalidId() {
 }
 
 func (s *UserControllerTestSuite) TestDeleteUser_Failure() {
-	s.mockService.SetDelete(func(u uint64) errorUtils.EntityError {
+	s.mockUserService.SetDelete(func(u uint64) errorUtils.EntityError {
 		return errorUtils.NewInternalServerError("error deleting user")
 	})
 	id:="1"
@@ -305,7 +320,7 @@ func (s *UserControllerTestSuite) TestDeleteUser_Failure() {
 }
 
 func (s *UserControllerTestSuite) TestGetAllUsers_Success() {
-	s.mockService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
 		return []domain.User{
 			{
 				ID: 1,
@@ -345,7 +360,7 @@ func (s *UserControllerTestSuite) TestGetAllUsers_Success() {
 
 
 func (s *UserControllerTestSuite) TestGetAllUsers_Failure() {
-	s.mockService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
+	s.mockUserService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
 		return nil, errorUtils.NewInternalServerError("error getting users")
 	})
 	req, err := http.NewRequest(http.MethodGet, "/users", nil)

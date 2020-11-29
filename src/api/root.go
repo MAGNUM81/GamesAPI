@@ -3,7 +3,6 @@ package api
 import (
 	"GamesAPI/src/database"
 	"GamesAPI/src/domain"
-	"GamesAPI/src/middleware"
 	"GamesAPI/src/router"
 	"GamesAPI/src/services"
 	"fmt"
@@ -25,9 +24,6 @@ func Bootstrap(r *gin.Engine) {
 
 	services.AuthorizationService = services.NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
 
-	//middleware.InitAuthorization(r) need authentication layer for authorization layer to make sense
-	middleware.InitApiToken(r) //this middleware should cover all routes without exception.
-	middleware.InitUserSessionHandler(r) //this middleware should cover all routes but /auth
 	//let's add a Session that doesn't expire for devs
 	//NOT FOR PROD
 	sessionKey := "2837503506"
@@ -38,7 +34,8 @@ func Bootstrap(r *gin.Engine) {
 	})
 	_,_ = fmt.Printf("This is the bypass session key : %s\n", sessionKey)
 	//END : NOT FOR PROD
-	router.InitRoutes(r)
+
+	router.InitAllRoutes(r)
 
 	err := r.Run()
 	HandleErrors(err)

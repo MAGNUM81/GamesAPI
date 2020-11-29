@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitAllUserRoutes(r *gin.Engine) {
-	g := InitUserRouterGroup(r)
+func InitAllUserRoutes(root *gin.RouterGroup) {
+	g := InitUserRouterGroup(root)
 	InitGetAllUsersRoute(g, controllers.GetAllUsers)
 	InitGetUserRoute(g, controllers.GetUser)
 	InitCreateUserRoute(g, controllers.CreateUser)
@@ -14,8 +14,8 @@ func InitAllUserRoutes(r *gin.Engine) {
 	InitDeleteUserRoute(g, controllers.DeleteUser)
 }
 
-func InitUserRouterGroup(r *gin.Engine) *gin.RouterGroup {
-	return r.Group("/users")
+func InitUserRouterGroup(g *gin.RouterGroup) *gin.RouterGroup {
+	return g.Group("/users")
 }
 
 func InitGetAllUsersRoute(g *gin.RouterGroup, handlerFunc gin.HandlerFunc) {

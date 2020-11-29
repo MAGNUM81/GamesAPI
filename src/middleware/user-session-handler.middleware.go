@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
-func InitUserSessionHandler(r *gin.Engine) {
-	r.Use(UserSessionHandler)
+func InitUserSessionHandler(g ...*gin.RouterGroup) {
+	for _, group := range g {
+		group.Use(UserSessionHandler)
+	}
 }
 
 func UserSessionHandler(c *gin.Context) {

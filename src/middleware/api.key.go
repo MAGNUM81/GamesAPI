@@ -8,9 +8,10 @@ import (
 // https://sosedoff.com/2014/12/21/gin-middleware.html?fbclid=IwAR2n3Kvdb1kgYitha4ur2q1bzrN5yukIESg2BKHEe6AoZdvanaZuYqpjwmE
 // (27 oct 2020)
 
-func InitApiToken(r *gin.Engine){
-	r.Use(MiddlewareHandler)
-
+func InitApiToken(g ...*gin.RouterGroup){
+	for _, group := range g {
+		group.Use(MiddlewareHandler)
+	}
 }
 
 // Message Contexte Error

@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-func InitAuthorization(r *gin.Engine) {
+func InitAuthorization(g *gin.RouterGroup) {
 	services.AuthorizationService = services.NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
-	r.Use(AuthorizationHandler)
+	g.Use(AuthorizationHandler)
 }
 
 func handleAuthError(c *gin.Context, status int, err error) {
