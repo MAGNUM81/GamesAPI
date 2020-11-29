@@ -72,7 +72,7 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_SessionNotExists() 
 	req.Header.Add("Authorization", "Bearer 123456")
 	s.r.ServeHTTP(s.rr,req)
 	assert.Equal(s.T(), http.StatusUnauthorized, s.rr.Code)
-	responseWWWAuth := s.rr.Header().Get("Www-Authenticate")
+	responseWWWAuth := s.rr.Header().Get("Www-ValidatePassword")
 	assert.True(s.T(), responseWWWAuth != "")
 }
 
@@ -102,7 +102,7 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_IsSessionExpired_Su
 	req.Header.Add("Authorization", "Bearer 123456")
 	s.r.ServeHTTP(s.rr,req)
 	assert.Equal(s.T(), http.StatusUnauthorized, s.rr.Code)
-	responseWWWAuth := s.rr.Header().Get("Www-Authenticate")
+	responseWWWAuth := s.rr.Header().Get("Www-ValidatePassword")
 	assert.True(s.T(), responseWWWAuth != "")
 }
 
