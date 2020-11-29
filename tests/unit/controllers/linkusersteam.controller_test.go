@@ -49,7 +49,8 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_ValidSteamId() {
 		}, nil
 	})
 	usersteamid := "12345678911234567"
-	req, _ := http.NewRequest(http.MethodGet, "/", bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/profiles/%s"}`, usersteamid)))
+	jsonBody := bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/profiles/%s", "userid":1}`, usersteamid))
+	req, _ := http.NewRequest(http.MethodPost, "/", jsonBody)
 	s.r.ServeHTTP(s.rr, req)
 
 	assert.EqualValues(s.T(), 200, s.rr.Code)
