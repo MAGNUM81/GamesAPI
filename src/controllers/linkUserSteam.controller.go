@@ -3,6 +3,7 @@ package controllers
 import (
 	"GamesAPI/src/External/Steam"
 	"GamesAPI/src/services"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
 )
@@ -64,9 +65,14 @@ func ErrorMessageTypeCode( c *gin.Context, code int, message  string) {
 func validateUrl(url  string) bool {
 //TODO
 	//url similar to  https://steamcommunity.com/profiles/############
-	//url doit etre https
+	//url doit etre https -- !?!
 	//steamcommunity
 	//split aumoins de 5
 	// split position 3 est /profile/ ou /id/
-	return true
+	if strings.Contains(url ,"steamcommunity"){
+		if len(strings.Split(url, "/")) >= 5{
+			if strings.Split(url, "/")[3] == "profiles" || strings.Split(url, "/")[3] == "id" {
+				return true
+		}}}
+	return false
 }
