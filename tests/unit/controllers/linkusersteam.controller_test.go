@@ -18,7 +18,7 @@ import (
 
 type LinkSteamUserTestSuite struct {
 	suite.Suite
-	mockUserService UserServiceMockInterface
+	mockUserService mocks.UserServiceMockInterface
 	mockSteamService mocks.SteamUserMockInterface
 	r *gin.Engine
 	rr *httptest.ResponseRecorder
@@ -29,7 +29,7 @@ func TestLinkSteamUsersControllerTestSuite(t *testing.T){
 }
 
 func (s *LinkSteamUserTestSuite) SetupSuite() {
-	mock := &userServiceMock{}
+	mock := &mocks.UserServiceMock{}
 	s.mockUserService = mock
 	services.UsersService = mock
 	s.r = gin.Default()
