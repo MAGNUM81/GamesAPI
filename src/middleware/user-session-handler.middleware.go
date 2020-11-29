@@ -59,6 +59,6 @@ func AbortWithError(c *gin.Context, code int, message string) {
 }
 
 func AbortWithWWWAuthenticate(c *gin.Context, code int, authenticateMessage string) {
-	c.Header("Www-Authenticate", authenticateMessage)
+	c.Header("Www-ValidatePassword", authenticateMessage)
 	c.AbortWithStatusJSON(code, gin.H{"Message" : authenticateMessage})
 }
