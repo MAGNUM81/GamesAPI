@@ -36,7 +36,7 @@ func (s *LinkSteamUserTestSuite) SetupSuite() {
 	s.r.POST("/", controllers.LinkSteamUser)
 }
 
-func (s *LinkSteamUserTestSuite) BeforeTest() {
+func (s *LinkSteamUserTestSuite) BeforeTest(_, _ string) {
 	s.rr = httptest.NewRecorder()
 }
 
@@ -48,6 +48,15 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_ValidSteamId() {
 			Email: "dev@test.com",
 		}, nil
 	})
+
+	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
+		return &domain.User{
+			ID:    1,
+			Name:  "dev",
+			Email: "dev@test.ru",
+		}, nil
+	})
+
 	usersteamid := "12345678911234567"
 	jsonBody := bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/profiles/%s", "userid":1}`, usersteamid))
 	req, _ := http.NewRequest(http.MethodPost, "/", jsonBody)
