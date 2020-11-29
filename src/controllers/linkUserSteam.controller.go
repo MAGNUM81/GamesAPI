@@ -3,7 +3,6 @@ package controllers
 import (
 	"GamesAPI/src/External/Steam"
 	"GamesAPI/src/services"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
 )
@@ -32,13 +31,15 @@ func LinkSteamUser(c *gin.Context){
 
 		return
 	}
+	var userSteamId string
+	var err2 error
 	if strings.Contains(steamUrl,"/profiles/"){
-		userSteamId := strings.Split(steamUrl, "/")[4]
+		userSteamId = strings.Split(steamUrl, "/")[4]
 	}
 	if strings.Contains(steamUrl,"/id/"){
-		userSteamId, error := Steam.ExternalSteamUserService.GetUserID(strings.Split(steamUrl, "/")[4])
+		userSteamId, err2 = Steam.ExternalSteamUserService.GetUserID(strings.Split(steamUrl, "/")[4])
 
-		if error != nil{
+		if err2 != nil{
 			ErrorMessageTypeCode(c, 400, "Could not get the user Steam id from Steam Url")
 			return
 		}
@@ -49,13 +50,13 @@ func LinkSteamUser(c *gin.Context){
 		ErrorMessageTypeCode(c, 400, "Service User could not get user from User id" )
 		return
 	}
-	user.SteamUserID = userSteamId
+	user.SteamUserId = userSteamId
 	_, errorUpdate := services.UsersService.UpdateUser(user)
 	if errorUpdate != nil{
 		ErrorMessageTypeCode(c, 400,"Error in service when updated User")
 		return
 	}
-	c.JSON(200,gin.H{"Message":"Succes"})
+	c.JSON(200,gin.H{"Message":"Success"})
 }
 
 func ErrorMessageTypeCode( c *gin.Context, code int, message  string) {
