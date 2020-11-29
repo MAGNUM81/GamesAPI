@@ -25,7 +25,7 @@ type LinkSteamUserTestSuite struct {
 }
 
 func TestLinkSteamUsersControllerTestSuite(t *testing.T){
-	suite.Run(t, new(UserControllerTestSuite))
+	suite.Run(t, new(LinkSteamUserTestSuite))
 }
 
 func (s *LinkSteamUserTestSuite) SetupSuite() {
@@ -40,15 +40,14 @@ func (s *LinkSteamUserTestSuite) BeforeTest() {
 	s.rr = httptest.NewRecorder()
 }
 
-func (s *UserControllerTestSuite) TestLinkUserSteam_ValidSteamId() {
-	s.mockService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
+func (s *LinkSteamUserTestSuite) TestLinkUserSteam_ValidSteamId() {
+	s.mockUserService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
 			ID:    1,
 			Name:  "dev",
 			Email: "dev@test.com",
 		}, nil
 	})
-
 	usersteamid := "12345678911234567"
 	req, _ := http.NewRequest(http.MethodGet, "/", bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/profiles/%s"}`, usersteamid)))
 	s.r.ServeHTTP(s.rr, req)
