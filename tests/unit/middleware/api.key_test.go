@@ -67,7 +67,7 @@ func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_Token
 
 	 tokenApi := "1234"
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
-	req.Header.Add("api_token",tokenApi)
+	req.Header.Add("x-api-key",tokenApi)
 	t.r.ServeHTTP(t.rr,req)
 
 	assert.Equal(t.T(), http.StatusOK, t.rr.Code)
@@ -95,7 +95,7 @@ func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_Error
 	})
 	tokenApi := "1245"
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
-	req.Header.Add("api_token",tokenApi)
+	req.Header.Add("x-api-key",tokenApi)
 	t.r.ServeHTTP(t.rr,req)
 
 	assert.Equal(t.T(), 500, t.rr.Code)
@@ -112,7 +112,7 @@ func (t *TestMiddlewareApiTokenSuite) TestMiddlewareService_Authentication_Inval
 	})
 	tokenApi := "1245"
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
-	req.Header.Add("api_token",tokenApi)
+	req.Header.Add("x-api-key",tokenApi)
 	t.r.ServeHTTP(t.rr,req)
 
 	assert.Equal(t.T(), 401, t.rr.Code)
