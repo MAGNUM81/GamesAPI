@@ -6,6 +6,7 @@ import (
 	"GamesAPI/src/utils/errorUtils"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -25,8 +26,13 @@ func AuthorizationHandler(c *gin.Context) {
 	//1. Determine which role the user has in our system using ctx.userId
 	//	 Assuming ctx has userId forces us to set userId in the Authentification layer's context
 	ctx := c.Request.Context()
-	userId := ctx.Value(domain.RbacUserId()).(uint64)
-	roles, err := services.UserRoleService.GetRolesByUserID(userId)
+	userId := ctx.Value(domain.RbacUserId())
+	if userId == nil {
+		handleAuthError(c, http.StatusInternalServerError, errors.New("no user id could be found in context"))
+		return
+	}
+
+	roles, err := services.UserRoleService.GetRolesByUserID(userId.(uint64))
 	if err != nil {
 		handleAuthError(c, err.Status(), err)
 		return
@@ -53,7 +59,7 @@ func AuthorizationHandler(c *gin.Context) {
 		handleAuthError(c, 400, endpointErr)
 		return
 	}
-
+	roleName = strings.ToLower(roleName)
 	//4. Authorize the request using all the info provided
 	authErr := services.AuthorizationService.Authorize(ctx, url, roleName, resource, endpoint)
 	if authErr != nil {
@@ -66,11 +72,11 @@ func AuthorizationHandler(c *gin.Context) {
 
 func extractResource(urlPath string) (string, error) {
 	if strings.Contains(urlPath, "/games") {
-		return "games", nil
+		return "game", nil
 	}
 
 	if strings.Contains(urlPath, "/users") {
-		return "users", nil
+		return "user", nil
 	}
 
 	return "", errors.New("resource does not exist")

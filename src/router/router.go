@@ -7,27 +7,30 @@ import (
 
 func InitAllRoutes(r *gin.Engine) {
 
-	coreGroup := initCoreGroup(r)
-	authGroup := initAuthGroup(r)
-
-	middleware.InitApiToken(coreGroup, authGroup) //will apply to all routes
-
-	middleware.InitAuthorization(coreGroup)
-	middleware.InitUserSessionHandler(coreGroup)
+	middleware.InitApiToken(r) //will apply to all routes
+	rootGroup := r.Group("")
+	{
+		initAuthGroup(rootGroup)
+		initCoreGroup(rootGroup)
+	}
 }
 
-func initCoreGroup(r *gin.Engine) *gin.RouterGroup {
+func initCoreGroup(r *gin.RouterGroup) {
 	//Make sure to init all routes for all modules here
-	g := r.Group("")
-	InitHomeRoutes(g)
-	InitAllGameRoutes(g)
-	InitAllUserRoutes(g)
-	return g
+	coreGroup := r.Group("")
+	{
+		middleware.InitUserSessionHandler(coreGroup)
+		middleware.InitAuthorization(coreGroup)
+		InitHomeRoutes(coreGroup)
+		InitAllGameRoutes(coreGroup)
+		InitAllUserRoutes(coreGroup)
+	}
 }
 
-func initAuthGroup(r *gin.Engine) *gin.RouterGroup {
-	g := r.Group("/auth")
-	InitLoginRoute(g)
-	//InitRefreshRoute(g)
-	return g
+func initAuthGroup(g *gin.RouterGroup){
+	auth := g.Group("/auth")
+	{
+		InitLoginRoute(auth)
+		//InitRefreshRoute(g)
+	}
 }

@@ -20,12 +20,17 @@ type UserSessionServiceInterface interface {
 	DeleteSession(token string) errorUtils.EntityError
 	IsSessionExpired(key string, currentTime time.Time) (bool, errorUtils.EntityError)
 	GenerateSessionToken(userId uint64, expireAt time.Time) (string, error)
+	GetSession(key string) (*domain.UserSession, errorUtils.EntityError)
 }
 
 
 type userSessionService struct {}
 
-func (u userSessionService) GenerateSessionToken(userId uint64, expireAt time.Time) (string, error) {
+func (u *userSessionService) GetSession(key string) (*domain.UserSession, errorUtils.EntityError) {
+	return domain.UserSessionRepo.Get(key)
+}
+
+func (u *userSessionService) GenerateSessionToken(userId uint64, expireAt time.Time) (string, error) {
 	h := fnv.New32a()
 	// add both values as bytes to a buffer big enough to contain them
 	buf := make([]byte, binary.MaxVarintLen64 + binary.MaxVarintLen64)
@@ -38,7 +43,7 @@ func (u userSessionService) GenerateSessionToken(userId uint64, expireAt time.Ti
 	return strconv.Itoa(int(h.Sum32())), err
 }
 
-func (u userSessionService) CreateSession(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError) {
+func (u *userSessionService) CreateSession(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError) {
 	if err := token.Validate(); err != nil {
 		return nil, err
 	}
@@ -55,7 +60,7 @@ func (u userSessionService) CreateSession(token *domain.UserSession) (*domain.Us
 	return ret, err
 }
 
-func (u userSessionService) IsSessionExpired(key string, currentTime time.Time) (bool, errorUtils.EntityError) {
+func (u *userSessionService) IsSessionExpired(key string, currentTime time.Time) (bool, errorUtils.EntityError) {
 	if !domain.UserSessionRepo.Exists(key) {
 		return true, errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", key))
 	}
@@ -69,11 +74,11 @@ func (u userSessionService) IsSessionExpired(key string, currentTime time.Time) 
 	return sesh.ExpiresAt < currentTime.UnixNano(), nil
 }
 
-func (u userSessionService) ExistsSession(key string) bool {
+func (u *userSessionService) ExistsSession(key string) bool {
 	return domain.UserSessionRepo.Exists(key)
 }
 
-func (u userSessionService) DeleteSession(key string) errorUtils.EntityError {
+func (u *userSessionService) DeleteSession(key string) errorUtils.EntityError {
 	if !domain.UserSessionRepo.Exists(key) {
 		return errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", key))
 	}

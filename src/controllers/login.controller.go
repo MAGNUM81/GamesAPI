@@ -85,6 +85,6 @@ func LoginController(c *gin.Context)  {
 
 	c.Header("Authorization", token)
 
-	c.JSON(http.StatusOK, gin.H{"Message" : fmt.Sprintf("User with email '%s' Successfully authenticated. " +
-		"Session token was sent in response's 'Authorization' header ", potentialUser.Email)})
+	c.JSON(http.StatusOK, gin.H{"Message" : fmt.Sprintf("User with email '%s' ID '%v' Successfully authenticated. " +
+		"Session token was sent in response's 'Authorization' header ", potentialUser.Email, potentialUser.ID)})
 }
