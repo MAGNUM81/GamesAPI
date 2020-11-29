@@ -22,7 +22,7 @@ func ErrorMessageTypeCode(c *gin.Context, code int, message interface{}) {
 func MiddlewareHandler(c *gin.Context) {
 	/// token := c.Request.FormValue("api_token") //.header
 
-		token := c.Request.Header.Get("api_token")
+		token := c.Request.Header.Get("x-api-key")
 
 		if token == "" {
 			ErrorMessageTypeCode(c, 400, "API token required")
