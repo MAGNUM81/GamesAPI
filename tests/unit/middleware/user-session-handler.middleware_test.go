@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"GamesAPI/src/domain"
 	"GamesAPI/src/middleware"
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils/errorUtils"
@@ -112,6 +113,14 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_SessionIsNotExpired
 	})
 	s.mockService.SetIsSessionExpired(func(key string, currentTime time.Time) (bool, errorUtils.EntityError) {
 		return false, nil
+	})
+
+	s.mockService.SetGetSession(func(key string) (*domain.UserSession, errorUtils.EntityError) {
+		return &domain.UserSession{
+			Token:     "12345",
+			UserId:    1,
+			ExpiresAt: time.Now().Add(time.Minute * 1).UnixNano(),
+		}, nil
 	})
 
 	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
