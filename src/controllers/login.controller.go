@@ -15,10 +15,11 @@ func abortWithError(c *gin.Context, code int, message string) {
 }
 
 func LoginController(c *gin.Context)  {
-	authenticateHeader := strings.Trim(c.Request.Header.Get("Www-Authenticate"), " ")
+	authenticateHeader := strings.Trim(c.Request.Header.Get("Authorization"), " ")
 	parts := strings.Split(authenticateHeader, ";")
 	if authenticateHeader == "" || len(parts) != 2 {
 		abortWithError(c, http.StatusBadRequest, "Www-Authenticate header was not set properly")
+		return
 	}
 
 	email, password := parts[0], []byte(parts[1])
@@ -51,14 +52,8 @@ func LoginController(c *gin.Context)  {
 
 	isPasswordValid, authErr := services.AuthenticationService.ValidatePassword(password, validPasswordHash)
 
-	if authErr != nil {
+	if authErr != nil || !isPasswordValid {
 		//password doesn't match
-		abortWithError(c, http.StatusUnauthorized, "Bad username/password combination")
-		return
-	}
-
-	if !isPasswordValid {
-		//typically this shouldn't happen, but we put it here just in case
 		abortWithError(c, http.StatusUnauthorized, "Bad username/password combination")
 		return
 	}
