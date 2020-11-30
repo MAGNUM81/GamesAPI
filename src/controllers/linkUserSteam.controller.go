@@ -7,9 +7,6 @@ import (
 	"strings"
 )
 
-//TODO
-//Error code to change !
-
 type input struct{
 	Userid uint64 `json:"userid"`
 	ProfileUrl string `json:"profile_url"`
@@ -40,20 +37,20 @@ func LinkSteamUser(c *gin.Context){
 		userSteamId, err2 = Steam.ExternalSteamUserService.GetUserID(strings.Split(steamUrl, "/")[4])
 
 		if err2 != nil{
-			ErrorMessageTypeCode(c, 400, "Could not get the user Steam id from Steam Url")
+			ErrorMessageTypeCode(c, 500, "Could not get the user Steam id from Steam Url")
 			return
 		}
 	}
 	userid := i.Userid
-	user,err := services.UsersService.GetUser(userid)
-	if err != nil {
-		ErrorMessageTypeCode(c, 400, "Service User could not get user from User id" )
+	user,errget := services.UsersService.GetUser(userid)
+	if errget != nil {
+		ErrorMessageTypeCode(c, errget.Status(), errget.Message() )
 		return
 	}
 	user.SteamUserId = userSteamId
 	_, errorUpdate := services.UsersService.UpdateUser(user)
 	if errorUpdate != nil{
-		ErrorMessageTypeCode(c, 400,"Error in service when updated User")
+		ErrorMessageTypeCode(c, errorUpdate.Status(),errorUpdate.Message())
 		return
 	}
 	c.JSON(200,gin.H{"Message":"Success"})
@@ -64,16 +61,11 @@ func ErrorMessageTypeCode( c *gin.Context, code int, message  string) {
 }
 
 func validateUrl(url  string) bool {
-//TODO
-	//url similar to  https://steamcommunity.com/profiles/############
-	//url doit etre https -- !?!
-	//steamcommunity
-	//split aumoins de 5
-	// split position 3 est /profile/ ou /id/
 	if strings.Contains(url ,"steamcommunity"){
 		if len(strings.Split(url, "/")) >= 5{
 			if strings.Split(url, "/")[3] == "profiles" || strings.Split(url, "/")[3] == "id" {
+				if strings.Split(url, "/")[4] != ""{
 				return true
-		}}}
+		}}}}
 	return false
 }
