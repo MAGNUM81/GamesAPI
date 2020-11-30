@@ -1,41 +1,16 @@
-package External
+package external
 
 import (
 	"GamesAPI/src/External/Steam"
+	"GamesAPI/tests/unit/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
-type SteamUserMockInterface interface{
-	SetGetUserID(func(string) (string, error))
-	SetGetUserOwnedGames(func(string) ([]string, error))
-}
-
-type steamUserMock struct {
-	getUserID func(string) (string, error)
-	getUserOwnedGames func(string) ([]string, error)
-}
-
-func (s *steamUserMock) GetUserID(personalURL string) (string, error) {
-	return s.getUserID(personalURL)
-}
-
-func (s *steamUserMock) GetUserOwnedGames(userID string)([]string, error){
-	return s.getUserOwnedGames(userID)
-}
-
-func (s *steamUserMock) SetGetUserID(f func(string) (string, error)) {
-	s.getUserID = f
-}
-
-func (s *steamUserMock)SetGetUserOwnedGames(f func(string) ([]string, error)){
-	s.getUserOwnedGames = f
-}
-
 type SteamUserAPITestSuite struct {
 	suite.Suite
-	mock SteamUserMockInterface
+	mock mocks.SteamUserMockInterface
 }
 
 func TestSteamUserAPITestSuite(t *testing.T){
@@ -43,7 +18,7 @@ func TestSteamUserAPITestSuite(t *testing.T){
 }
 
 func (s *SteamUserAPITestSuite) SetupSuite() {
-	mock := &steamUserMock{}
+	mock := &mocks.SteamUserMock{}
 	s.mock = mock
 	Steam.ExternalSteamUserService = mock
 }

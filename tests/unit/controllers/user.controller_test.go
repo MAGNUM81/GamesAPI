@@ -5,6 +5,7 @@ import (
 	"GamesAPI/src/router"
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils/errorUtils"
+	"GamesAPI/tests/unit/mocks"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -15,66 +16,9 @@ import (
 	"testing"
 )
 
-type UserServiceMockInterface interface {
-	SetGetUser(func(uint64) (*domain.User, errorUtils.EntityError))
-	SetCreateUser(func(*domain.User) (*domain.User, errorUtils.EntityError))
-	SetUpdateUser(func(*domain.User) (*domain.User, errorUtils.EntityError))
-	SetDelete(func(uint64) errorUtils.EntityError)
-	SetGetAll(func() ([]domain.User, errorUtils.EntityError))
-}
-
-type userServiceMock struct {
-	services.UsersServiceInterface
-	getUserService func(uint64) (*domain.User, errorUtils.EntityError)
-	createUserService func(*domain.User) (*domain.User, errorUtils.EntityError)
-	updateUserService func(*domain.User) (*domain.User, errorUtils.EntityError)
-	deleteUserService func(uint64) errorUtils.EntityError
-	getAllUserService func() ([]domain.User, errorUtils.EntityError)
-}
-
-func (u *userServiceMock) GetUser(id uint64) (*domain.User, errorUtils.EntityError) {
-	return u.getUserService(id)
-}
-
-func (u *userServiceMock) CreateUser(user *domain.User) (*domain.User, errorUtils.EntityError) {
-	return u.createUserService(user)
-}
-
-func (u *userServiceMock) UpdateUser(user *domain.User) (*domain.User, errorUtils.EntityError) {
-	return u.updateUserService(user)
-}
-
-func (u *userServiceMock) DeleteUser(id uint64) errorUtils.EntityError {
-	return u.deleteUserService(id)
-}
-
-func (u *userServiceMock) GetAllUsers() ([]domain.User, errorUtils.EntityError) {
-	return u.getAllUserService()
-}
-
-func (u *userServiceMock) SetGetUser(f func(uint64) (*domain.User, errorUtils.EntityError)) {
-	u.getUserService = f
-}
-
-func (u *userServiceMock) SetCreateUser(f func(*domain.User) (*domain.User, errorUtils.EntityError)) {
-	u.createUserService = f
-}
-
-func (u *userServiceMock) SetUpdateUser(f func(*domain.User) (*domain.User, errorUtils.EntityError)) {
-	u.updateUserService = f
-}
-
-func (u *userServiceMock) SetDelete(f func(uint64) errorUtils.EntityError) {
-	u.deleteUserService = f
-}
-
-func (u *userServiceMock) SetGetAll(f func() ([]domain.User, errorUtils.EntityError)) {
-	u.getAllUserService = f
-}
-
 type UserControllerTestSuite struct {
 	suite.Suite
-	mockService UserServiceMockInterface
+	mockService mocks.UserServiceMockInterface
 	r *gin.Engine
 	rr *httptest.ResponseRecorder
 
@@ -85,7 +29,7 @@ func TestUsersControllerTestSuite(t *testing.T){
 }
 
 func (s *UserControllerTestSuite) SetupSuite() {
-	mock := &userServiceMock{}
+	mock := &mocks.UserServiceMock{}
 	s.mockService = mock
 	services.UsersService = mock
 	s.r = gin.Default()
