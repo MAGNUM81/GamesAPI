@@ -72,22 +72,38 @@ func (e externalSteamUserService) GetGameInfo(gameID string) (domain.Game, error
 	if err != nil {
 		return domain.Game{}, err
 	}
-	var unFilterGameInfo getGameInfoSteamType
+	var unFilterGameInfo map[string]interface{}
 	json.Unmarshal(gameInfo, &unFilterGameInfo)
-
+	if !unFilterGameInfo[gameID].(map[string]interface{})["success"].(bool) {
+		return domain.Game{}, errors.New("bad game ID")
+	}
+	//Devilish line used to get 2 level deeper into the json struct without knowing the exact way the struct is defined
+	var pureGameInfo = unFilterGameInfo[gameID].(map[string]interface{})["data"].(map[string]interface{})
 	var filteredGameInfo domain.Game
-	filteredGameInfo.Title = unFilterGameInfo.GameInfo.Data.Name
-	filteredGameInfo.Developer = unFilterGameInfo.GameInfo.Data.Developers[0]
-	filteredGameInfo.Publisher = unFilterGameInfo.GameInfo.Data.Publishers[0]
-	year,month,day := steamTimeParser(unFilterGameInfo.GameInfo.Data.ReleaseDate.Date)
-	filteredGameInfo.ReleaseDate = time.Date(year,month,day,0,0,0,0,nil)
+
+	filteredGameInfo.Title = pureGameInfo["name"].(string)
+	filteredGameInfo.Developer = interfaceListToSingleString(pureGameInfo["developers"].([]interface{}))
+	filteredGameInfo.Publisher = interfaceListToSingleString(pureGameInfo["publishers"].([]interface{}))
+
+	var date = pureGameInfo["release_date"].(map[string]interface{})
+	year,month,day := steamTimeParser(date["date"].(string))
+	filteredGameInfo.ReleaseDate = time.Date(year,month,day,0,0,0,0,time.UTC)
 	return filteredGameInfo, nil
+}
+
+func interfaceListToSingleString(interfaceList []interface{}) string {
+	var singleString string
+	for x := range interfaceList {
+		singleString += interfaceList[x].(string) + " | "
+	}
+	//will remove the last useless separator
+	return strings.TrimSuffix(singleString, " | ")
 }
 
 func steamTimeParser(steamTime string)(int, time.Month, int) {
 	splitedTime := strings.Split(steamTime, " ")
-	year,_ := strconv.Atoi(splitedTime[0])
-	day,_ := strconv.Atoi(splitedTime[2])
+	day,_ := strconv.Atoi(splitedTime[0])
+	year,_ := strconv.Atoi(splitedTime[2])
 	switch splitedTime[1] {
 	case "Jan,":
 		return year, 1, day

@@ -2,10 +2,13 @@ package external
 
 import (
 	"GamesAPI/src/External/Steam"
+	"GamesAPI/src/domain"
 	"GamesAPI/tests/unit/mocks"
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
 )
 
 type SteamUserAPITestSuite struct {
@@ -75,4 +78,62 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_BadUserID(){
 	t := s.T()
 	assert.Nil(t, err)
 	assert.EqualValues(t, 0, len(steamGamesIDs))
+}
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_Success(){
+	s.mock.SetGetGameInfo(func(gameID string)(domain.Game,error){
+		return domain.Game{
+			ID:          0,
+			CreatedAt:   time.Time{},
+			UpdatedAt:   time.Time{},
+			DeletedAt:   nil,
+			Title:       "NieR:Automata™",
+			Developer:   "Square Enix | PlatinumGames Inc.",
+			Publisher:   "Square Enix",
+			ReleaseDate: time.Date(2017,time.March,17,0,0,0,0,time.UTC),
+		}, nil
+	})
+	gameID := "524220"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.Nil(t, err)
+	assert.EqualValues(t, "NieR:Automata™", gameInfo.Title)
+	assert.EqualValues(t, "Square Enix | PlatinumGames Inc.", gameInfo.Developer)
+	assert.EqualValues(t, "Square Enix", gameInfo.Publisher)
+	assert.EqualValues(t, time.Date(2017,time.March,17,0,0,0,0,time.UTC), gameInfo.ReleaseDate)
+}
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_SuccessSecondGame(){
+	s.mock.SetGetGameInfo(func(gameID string)(domain.Game,error){
+		return domain.Game{
+			ID:          0,
+			CreatedAt:   time.Time{},
+			UpdatedAt:   time.Time{},
+			DeletedAt:   nil,
+			Title:       "PAYDAY 2",
+			Developer:   "OVERKILL - a Starbreeze Studio.",
+			Publisher:   "Starbreeze Publishing AB",
+			ReleaseDate: time.Date(2013,time.August,13,0,0,0,0,time.UTC),
+		}, nil
+	})
+	gameID := "218620"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.Nil(t, err)
+	assert.EqualValues(t, "PAYDAY 2", gameInfo.Title)
+	assert.EqualValues(t, "OVERKILL - a Starbreeze Studio.", gameInfo.Developer)
+	assert.EqualValues(t, "Starbreeze Publishing AB", gameInfo.Publisher)
+	assert.EqualValues(t, time.Date(2013,time.August,13,0,0,0,0,time.UTC), gameInfo.ReleaseDate)
+}
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_BadGameID(){
+	s.mock.SetGetGameInfo(func(gameID string)(domain.Game,error){
+		return domain.Game{}, errors.New("bad Game ID")
+	})
+	gameID := "65465156435"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.NotNil(t, err)
+	assert.EqualValues(t, domain.Game{}, gameInfo)
+
 }

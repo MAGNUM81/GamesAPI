@@ -2,10 +2,12 @@ package SteamAPI
 
 import (
 	"GamesAPI/src/External/Steam"
+	"GamesAPI/src/domain"
 	"GamesAPI/tests/integration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
 )
 
 type SteamUserAPITestSuite struct {
@@ -70,5 +72,29 @@ func (s *SteamUserAPITestSuite) TestGetSteamGame_Success(){
 	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
 	t := s.T()
 	assert.Nil(t, err)
-	assert.EqualValues(t, "NieR Automata", gameInfo.Title)
+	assert.EqualValues(t, "NieR:Automata™", gameInfo.Title)
+	assert.EqualValues(t, "Square Enix | PlatinumGames Inc.", gameInfo.Developer)
+	assert.EqualValues(t, "Square Enix", gameInfo.Publisher)
+	assert.EqualValues(t, time.Date(2017,time.March,17,0,0,0,0,time.UTC), gameInfo.ReleaseDate)
 }
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_SuccessSecondGame(){
+	gameID := "218620"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.Nil(t, err)
+	assert.EqualValues(t, "PAYDAY 2", gameInfo.Title)
+	assert.EqualValues(t, "OVERKILL - a Starbreeze Studio.", gameInfo.Developer)
+	assert.EqualValues(t, "Starbreeze Publishing AB", gameInfo.Publisher)
+	assert.EqualValues(t, time.Date(2013,time.August,13,0,0,0,0,time.UTC), gameInfo.ReleaseDate)
+}
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_BadGameID(){
+	gameID := "65465156435"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.NotNil(t, err)
+	assert.EqualValues(t, domain.Game{}, gameInfo)
+
+}
+
