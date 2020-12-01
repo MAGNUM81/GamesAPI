@@ -64,3 +64,11 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_BadUserID(){
 	assert.Nil(t, err)
 	assert.EqualValues(t, 0, len(steamGamesIDs))
 }
+
+func (s *SteamUserAPITestSuite) TestGetSteamGame_Success(){
+	gameID := "524220"
+	gameInfo, err := Steam.ExternalSteamUserService.GetGameInfo(gameID)
+	t := s.T()
+	assert.Nil(t, err)
+	assert.EqualValues(t, "NieR Automata", gameInfo.Title)
+}
