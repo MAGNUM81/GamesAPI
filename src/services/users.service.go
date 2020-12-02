@@ -50,6 +50,7 @@ func (u usersService) UpdateUser(user *domain.User) (*domain.User, errorUtils.En
 	}
 	current.Email = user.Email
 	current.Name = user.Name
+	current.SteamUserId = user.SteamUserId
 
 	updatedUser, err := domain.UserRepo.Update(current)
 	if err != nil {

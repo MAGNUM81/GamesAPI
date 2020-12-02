@@ -79,6 +79,14 @@ func extractResource(urlPath string) (string, error) {
 		return "user", nil
 	}
 
+	if strings.Contains(urlPath, "/LinkSteamUser") {
+		return "link_steam_user", nil
+	}
+
+	if strings.Contains(urlPath, "/SyncGames") {
+		return "sync_games", nil
+	}
+
 	return "", errors.New("resource does not exist")
 }
 

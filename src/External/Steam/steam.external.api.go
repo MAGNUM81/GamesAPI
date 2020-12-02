@@ -83,6 +83,7 @@ func (e externalSteamUserService) GetGameInfo(gameID string) (domain.Game, error
 	filteredGameInfo.Title = pureGameInfo["name"].(string)
 	filteredGameInfo.Developer = interfaceListToSingleString(pureGameInfo["developers"].([]interface{}))
 	filteredGameInfo.Publisher = interfaceListToSingleString(pureGameInfo["publishers"].([]interface{}))
+	filteredGameInfo.SteamId = gameID
 
 	var date = pureGameInfo["release_date"].(map[string]interface{})
 	year,month,day := steamTimeParser(date["date"].(string))

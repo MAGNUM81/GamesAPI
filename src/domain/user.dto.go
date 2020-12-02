@@ -14,7 +14,7 @@ type User struct {
 	Name         string     `gorm:"column:name;not null;" json:"name"`
 	Email        string     `gorm:"column:email;not null;unique" json:"email"`
 	PasswordHash string     `gorm:"column:password_hash;not null;default:'hashpass'" json:"password_hash"`
-	SteamUserId  string     `gorm:"column:steam_user_id;not null" json:"steam_user_id"`
+	SteamUserId  string     `gorm:"column:steam_user_id;not null;default:'nullid'" json:"steam_user_id"`
 }
 
 func (u *User) Validate() errorUtils.EntityError {
