@@ -3,12 +3,11 @@ package api
 import (
 	"GamesAPI/src/database"
 	"GamesAPI/src/domain"
-	"GamesAPI/src/middleware"
 	"GamesAPI/src/router"
 	"GamesAPI/src/services"
+	"GamesAPI/src/utils/authUtils"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"os"
 	"time"
 )
 
@@ -23,11 +22,6 @@ func Bootstrap(r *gin.Engine) {
 	}
 	defer dbInstance.Close()
 
-	services.AuthorizationService = services.NewAuthorizationService(os.Getenv("RBAC_FILEPATH"))
-
-	//middleware.InitAuthorization(r) need authentication layer for authorization layer to make sense
-	middleware.InitApiToken(r) //this middleware should cover all routes without exception.
-	middleware.InitUserSessionHandler(r) //this middleware should cover all routes but /auth
 	//let's add a Session that doesn't expire for devs
 	//NOT FOR PROD
 	sessionKey := "2837503506"
@@ -36,9 +30,30 @@ func Bootstrap(r *gin.Engine) {
 		UserId:    1,
 		ExpiresAt: time.Now().AddDate(1, 0, 0).UnixNano(),//token will expire 1 year after server boot up
 	})
+	h, _ := authUtils.HashAndSalt([]byte("network7"))
+	users, _ := services.UsersService.GetAllUsers()
+	_ = fmt.Sprintf("%v", users)
+	u, _ := services.UsersService.GetUser(uint64(1))
+	masterEmail := "master@test.com"
+	if u == nil {
+		_,_ = services.UsersService.CreateUser(&domain.User{
+			Name:         "master",
+			Email:        masterEmail,
+			PasswordHash: h,
+		})
+	}
+	role, _ := services.UserRoleService.GetRolesByUserID(uint64(1))
+	if len(role) == 0 {
+		_,_ = services.UserRoleService.CreateRole(&domain.UserRole{
+			UserID: 1,
+			Name:   "admin",
+		})
+	}
 	_,_ = fmt.Printf("This is the bypass session key : %s\n", sessionKey)
+	_,_ = fmt.Printf("This is the master email : %s\n", masterEmail)
 	//END : NOT FOR PROD
-	router.InitRoutes(r)
+
+	router.InitAllRoutes(r)
 
 	err := r.Run()
 	HandleErrors(err)

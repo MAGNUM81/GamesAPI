@@ -10,7 +10,6 @@ import (
 
 func InitApiToken(r *gin.Engine){
 	r.Use(MiddlewareHandler)
-
 }
 
 // Message Contexte Error

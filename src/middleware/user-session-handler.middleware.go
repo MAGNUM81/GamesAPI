@@ -1,16 +1,20 @@
 package middleware
 
 import (
+	"GamesAPI/src/domain"
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils/errorUtils"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
 )
 
-func InitUserSessionHandler(r *gin.Engine) {
-	r.Use(UserSessionHandler)
+func InitUserSessionHandler(g ...*gin.RouterGroup) {
+	for _, group := range g {
+		group.Use(UserSessionHandler)
+	}
 }
 
 func UserSessionHandler(c *gin.Context) {
@@ -50,6 +54,14 @@ func UserSessionHandler(c *gin.Context) {
 		AbortWithWWWAuthenticate(c, 401, "Session is expired")
 		return
 	}
+
+	session, err := services.UserSessionService.GetSession(sessionKey)
+	if err != nil {
+		AbortWithWWWAuthenticate(c, 401, "Session doesn't exists, WTF")
+		return
+	}
+
+	c.Request = c.Request.WithContext(context.WithValue(context.Background(), domain.RbacUserId(), session.UserId))
 
 	c.Next()
 }

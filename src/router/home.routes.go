@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitHomeRoutes(r *gin.Engine) {
-	r.GET("/", controllers.Home)
+func InitHomeRoutes(g *gin.RouterGroup) {
+	g.GET("/", controllers.Home)
 }
 

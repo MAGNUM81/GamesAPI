@@ -90,7 +90,7 @@ func (s *GameControllerTestSuite) SetupSuite() {
 	s.mockService = mock
 	services.GamesService = mock
 	s.r = gin.Default()
-	router.InitAllGameRoutes(s.r)
+	router.InitAllGameRoutes(s.r.Group(""))
 }
 
 func (s *GameControllerTestSuite) BeforeTest(_, _ string) {
