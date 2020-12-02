@@ -14,8 +14,8 @@ type EntityError interface {
 type entityError struct {
 	error
 	ErrorMessage string `json:"message"`
-	ErrorStatus int `json:"status"`
-	ErrError string `json:"error"`
+	ErrorStatus  int    `json:"status"`
+	ErrError     string `json:"error"`
 }
 
 func (e *entityError) Error() string {
@@ -36,8 +36,8 @@ func NewEntityError(err error) EntityError {
 	}
 	return &entityError{
 		ErrorMessage: err.Error(),
-		ErrError: err.Error(),
-		ErrorStatus: http.StatusInternalServerError,
+		ErrError:     err.Error(),
+		ErrorStatus:  http.StatusInternalServerError,
 	}
 }
 
@@ -45,7 +45,7 @@ func NewNotFoundError(message string) EntityError {
 	return &entityError{
 		ErrorMessage: message,
 		ErrorStatus:  http.StatusNotFound,
-		ErrError:   "not_found",
+		ErrError:     "not_found",
 	}
 }
 
@@ -53,7 +53,7 @@ func NewBadRequestError(message string) EntityError {
 	return &entityError{
 		ErrorMessage: message,
 		ErrorStatus:  http.StatusBadRequest,
-		ErrError:   "bad_request",
+		ErrError:     "bad_request",
 	}
 }
 
@@ -61,7 +61,7 @@ func NewUnprocessableEntityError(message string) EntityError {
 	return &entityError{
 		ErrorMessage: message,
 		ErrorStatus:  http.StatusUnprocessableEntity,
-		ErrError:   "invalid_request",
+		ErrError:     "invalid_request",
 	}
 }
 
@@ -77,6 +77,6 @@ func NewInternalServerError(message string) EntityError {
 	return &entityError{
 		ErrorMessage: message,
 		ErrorStatus:  http.StatusInternalServerError,
-		ErrError:   "server_error",
+		ErrError:     "server_error",
 	}
 }

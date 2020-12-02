@@ -61,10 +61,3 @@ func (a *authorizationService) Authorize(ctx context.Context, url *url.URL, role
 func (a *authorizationService) GetRbac() domain.RBAC {
 	return a.rbac
 }
-
-
-
-
-
-
-

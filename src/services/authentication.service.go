@@ -10,7 +10,7 @@ type AuthServiceInterface interface {
 	ValidatePassword(plainPassword []byte, hashedPassword string) (bool, error)
 }
 
-type AuthService struct {}
+type AuthService struct{}
 
 func (a *AuthService) ValidatePassword(plainPassword []byte, hashedPassword string) (bool, error) {
 	return authUtils.CompareStrings(hashedPassword, plainPassword)

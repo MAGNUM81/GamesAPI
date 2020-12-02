@@ -24,7 +24,7 @@ func GetGame(c *gin.Context) {
 	}
 
 	game, err := services.GamesService.GetGame(gameId)
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -33,7 +33,7 @@ func GetGame(c *gin.Context) {
 
 func GetAllGames(c *gin.Context) {
 	games, err := services.GamesService.GetAllGames()
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 

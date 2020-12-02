@@ -34,7 +34,7 @@ func GetUser(c *gin.Context) {
 
 func GetAllUsers(c *gin.Context) {
 	users, err := services.UsersService.GetAllUsers()
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -110,7 +110,7 @@ func CreateUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 	userId, err := getUserId(c.Param("id"))
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -131,10 +131,10 @@ func UpdateUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 	userId, err := getUserId(c.Param("id"))
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
-	if err := services.UsersService.DeleteUser(userId); errorUtils.IsEntityError(c, err){
+	if err := services.UsersService.DeleteUser(userId); errorUtils.IsEntityError(c, err) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})

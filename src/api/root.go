@@ -28,7 +28,7 @@ func Bootstrap(r *gin.Engine) {
 	_, _ = services.UserSessionService.CreateSession(&domain.UserSession{
 		Token:     sessionKey,
 		UserId:    1,
-		ExpiresAt: time.Now().AddDate(1, 0, 0).UnixNano(),//token will expire 1 year after server boot up
+		ExpiresAt: time.Now().AddDate(1, 0, 0).UnixNano(), //token will expire 1 year after server boot up
 	})
 	h, _ := authUtils.HashAndSalt([]byte("network7"))
 	users, _ := services.UsersService.GetAllUsers()

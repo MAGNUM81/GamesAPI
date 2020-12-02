@@ -7,14 +7,14 @@ import (
 )
 
 type User struct {
-	ID        uint64 `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time `json:"created_at" json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" json:"updated_at"`
-	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
-	Name string  `gorm:"column:name;not null;" json:"name"`
-	Email string `gorm:"column:email;not null;unique" json:"email"`
-	PasswordHash string `gorm:"column:password_hash;not null;default:'hashpass'" json:"password_hash"`
-	SteamUserId string `gorm:"column:steam_user_id;not null" json:"steam_user_id"`
+	ID           uint64     `gorm:"primary_key" json:"id"`
+	CreatedAt    time.Time  `json:"created_at" json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at" json:"updated_at"`
+	DeletedAt    *time.Time `sql:"index" json:"deleted_at"`
+	Name         string     `gorm:"column:name;not null;" json:"name"`
+	Email        string     `gorm:"column:email;not null;unique" json:"email"`
+	PasswordHash string     `gorm:"column:password_hash;not null;default:'hashpass'" json:"password_hash"`
+	SteamUserId  string     `gorm:"column:steam_user_id;not null" json:"steam_user_id"`
 }
 
 func (u *User) Validate() errorUtils.EntityError {

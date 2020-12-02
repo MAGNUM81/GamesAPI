@@ -9,7 +9,7 @@ var (
 	UserRoleService UserRoleServiceInterface = &userRoleService{}
 )
 
-type userRoleService struct {}
+type userRoleService struct{}
 
 type UserRoleServiceInterface interface {
 	GetRole(userRoleId uint64) (*domain.UserRole, errorUtils.EntityError)

@@ -14,7 +14,7 @@ func abortWithError(c *gin.Context, code int, message string) {
 	c.AbortWithStatusJSON(code, gin.H{"Error": message})
 }
 
-func LoginController(c *gin.Context)  {
+func LoginController(c *gin.Context) {
 	authenticateHeader := strings.Trim(c.Request.Header.Get("Authorization"), " ")
 	parts := strings.Split(authenticateHeader, ";")
 	if authenticateHeader == "" || len(parts) != 2 {

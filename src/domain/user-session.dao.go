@@ -3,8 +3,8 @@ package domain
 import "GamesAPI/src/utils/errorUtils"
 
 var (
-	UserSessionRepo UserSessionRepoInterface = NewUserAuthTokenRepository()
-	)
+	UserSessionRepo = NewUserAuthTokenRepository()
+)
 
 type UserSessionRepoInterface interface {
 	Get(key string) (*UserSession, errorUtils.EntityError)
@@ -43,5 +43,3 @@ func (u *userSessionRepo) Exists(key string) bool {
 func NewUserAuthTokenRepository() UserSessionRepoInterface {
 	return &userSessionRepo{repo: map[string]*UserSession{}}
 }
-
-

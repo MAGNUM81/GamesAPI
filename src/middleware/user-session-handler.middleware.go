@@ -67,10 +67,10 @@ func UserSessionHandler(c *gin.Context) {
 }
 
 func AbortWithError(c *gin.Context, code int, message string) {
-	c.AbortWithStatusJSON(code, gin.H{"Error" : message})
+	c.AbortWithStatusJSON(code, gin.H{"Error": message})
 }
 
 func AbortWithWWWAuthenticate(c *gin.Context, code int, authenticateMessage string) {
 	c.Header("Www-ValidatePassword", authenticateMessage)
-	c.AbortWithStatusJSON(code, gin.H{"Message" : authenticateMessage})
+	c.AbortWithStatusJSON(code, gin.H{"Message": authenticateMessage})
 }
