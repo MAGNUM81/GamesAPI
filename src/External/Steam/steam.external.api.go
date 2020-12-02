@@ -27,7 +27,7 @@ type ExternalSteamUserServiceInterface interface {
 func getFromSteam(requestURL string) ([]byte, error) {
 	resp, err := http.Get(requestURL)
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	err = resp.Body.Close()
 
 	return bodyBytes, err
 }
@@ -71,22 +71,46 @@ func (e externalSteamUserService) GetGameInfo(gameID string) (domain.Game, error
 	if err != nil {
 		return domain.Game{}, err
 	}
+
 	var unFilterGameInfo map[string]interface{}
-	json.Unmarshal(gameInfo, &unFilterGameInfo)
+	err = json.Unmarshal(gameInfo, &unFilterGameInfo)
+	if err != nil {
+		return domain.Game{}, err
+	}
+	var successMaybeSomeday = unFilterGameInfo[gameID]
+	if successMaybeSomeday == nil {
+		return domain.Game{}, errors.New("server did not respond correctly")
+	}
 	if !unFilterGameInfo[gameID].(map[string]interface{})["success"].(bool) {
 		return domain.Game{}, errors.New("bad game ID")
 	}
+
+	data := unFilterGameInfo[gameID].(map[string]interface{})["data"]
+	if data == nil {
+		return domain.Game{}, errors.New("game data is invalid")
+	}
 	//Devilish line used to get 2 level deeper into the json struct without knowing the exact way the struct is defined
-	var pureGameInfo = unFilterGameInfo[gameID].(map[string]interface{})["data"].(map[string]interface{})
+	var pureGameInfo = data.(map[string]interface{})
 	var filteredGameInfo domain.Game
 
+	devs := pureGameInfo["developers"]
+	if devs == nil {
+		filteredGameInfo.Developer = ""
+	} else {
+		filteredGameInfo.Developer = interfaceListToSingleString(pureGameInfo["developers"].([]interface{}))
+	}
+	pubs := pureGameInfo["publishers"]
+	if pubs == nil {
+		filteredGameInfo.Publisher = ""
+	} else {
+		filteredGameInfo.Publisher = interfaceListToSingleString(pureGameInfo["publishers"].([]interface{}))
+	}
 	filteredGameInfo.Title = pureGameInfo["name"].(string)
-	filteredGameInfo.Developer = interfaceListToSingleString(pureGameInfo["developers"].([]interface{}))
-	filteredGameInfo.Publisher = interfaceListToSingleString(pureGameInfo["publishers"].([]interface{}))
+	filteredGameInfo.SteamId = gameID
 
-	var date = pureGameInfo["release_date"].(map[string]interface{})
-	year,month,day := steamTimeParser(date["date"].(string))
-	filteredGameInfo.ReleaseDate = time.Date(year,month,day,0,0,0,0,time.UTC)
+	//var date = pureGameInfo["release_date"].(map[string]interface{})
+	//year,month,day := steamTimeParser(date["date"].(string))
+	//filteredGameInfo.ReleaseDate = time.Date(year,month,day,0,0,0,0,time.UTC)
 	return filteredGameInfo, nil
 }
 

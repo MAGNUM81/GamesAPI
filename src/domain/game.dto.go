@@ -14,6 +14,7 @@ type Game struct {
 	Developer   string     `json:"developer"`
 	Publisher   string     `json:"publisher"`
 	ReleaseDate time.Time  `gorm:"column:releaseDate" json:"releaseDate"`
+	SteamId		string	   `gorm:"column:steam_id" json:"steam_id"`
 }
 
 func (g *Game) Validate() errorUtils.EntityError {
@@ -28,8 +29,9 @@ func (g *Game) Validate() errorUtils.EntityError {
 	}
 
 	//check for empty publisher
-	if g.Publisher == "" {
-		return errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty")
-	}
+	//Steam sometimes return an empty publisher... let's skip this then
+	//if g.Publisher == "" {
+	//	return errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty")
+	//}
 	return nil
 }

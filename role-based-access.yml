@@ -24,6 +24,12 @@ user:
       allow: false
     delete:
       allow: false
+  link_steam_user:
+    create:
+      allow: false
+  sync_gamees:
+    create:
+      allow: false
 #admin can do anything
 admin:
   user:
@@ -44,4 +50,9 @@ admin:
       allow: true
     delete:
       allow: true
-    
+  link_steam_user:
+    create:
+      allow: true
+  sync_games:
+    create:
+      allow: true
