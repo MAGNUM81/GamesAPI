@@ -1,32 +1,43 @@
-#%RAML 0.8
+#%RAML 1.0
 
 
 title: Game API
-  
-version: v1
+baseUri: "http://localhost:8080/"
+/:
+  displayName: Salutations
+  description: Pour dire salutations à l'usager
 
-traits:
-  /Auth:
-    /Login:
-
-  /User:
+/auth:
+  /login:
     post:
+      description: usager -> login
+
+/users:
+  get:
+    description: fetch tous les usagers
+  post:
+    description: créer un usager
+  /{id}:
     get:
+      description: fetch un usager en particulier
+    patch:
+      description: MAJ un usager en particulier
+    del:
+      description: supprimer un usager en particulier
+
+/games:
+  get:
+  post:
+  /{id}:
     get:
     patch:
     del:
 
-  /Games:
-    post:
-    get:
-    get:
-    patch:
-    del:
+/LinkSteamUser:
+  post:
 
-  /LinkSteamUser:
-    get:
+/SyncGames:
+  post:
 
-  /SyncGames:
-    get:
 
 
