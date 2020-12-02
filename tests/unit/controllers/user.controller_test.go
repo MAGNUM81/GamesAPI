@@ -19,7 +19,7 @@ import (
 type UserControllerTestSuite struct {
 	suite.Suite
 	mockUserRoleService mocks.UserRoleServiceMockInterface
-	mockService         mocks.UserServiceMockInterface
+	mockUserService         mocks.UserServiceMockInterface
 	r                   *gin.Engine
 	rr                  *httptest.ResponseRecorder
 }
