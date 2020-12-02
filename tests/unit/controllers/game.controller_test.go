@@ -6,6 +6,7 @@ import (
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils"
 	"GamesAPI/src/utils/errorUtils"
+	"GamesAPI/tests/unit/mocks"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -16,77 +17,19 @@ import (
 	"testing"
 )
 
-type GameServiceMockInterface interface {
-	SetGetGame(func(uint64) (*domain.Game, errorUtils.EntityError))
-	SetCreateGame(func(*domain.Game) (*domain.Game, errorUtils.EntityError))
-	SetUpdateGame(func(*domain.Game) (*domain.Game, errorUtils.EntityError))
-	SetDelete(func(uint64) errorUtils.EntityError)
-	SetGetAll(func() ([]domain.Game, errorUtils.EntityError))
-}
-
-type gameServiceMock struct {
-	services.GamesServiceInterface
-	getGameService func(uint64) (*domain.Game, errorUtils.EntityError)
-	createGameService func(*domain.Game) (*domain.Game, errorUtils.EntityError)
-	updateGameService func(*domain.Game) (*domain.Game, errorUtils.EntityError)
-	deleteGameService func(uint64) errorUtils.EntityError
-	getAllGameService func() ([]domain.Game, errorUtils.EntityError)
-}
-
-func (u *gameServiceMock) GetGame(id uint64) (*domain.Game, errorUtils.EntityError) {
-	return u.getGameService(id)
-}
-
-func (u *gameServiceMock) CreateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
-	return u.createGameService(game)
-}
-
-func (u *gameServiceMock) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
-	return u.updateGameService(game)
-}
-
-func (u *gameServiceMock) DeleteGame(id uint64) errorUtils.EntityError {
-	return u.deleteGameService(id)
-}
-
-func (u *gameServiceMock) GetAllGames() ([]domain.Game, errorUtils.EntityError) {
-	return u.getAllGameService()
-}
-
-func (u *gameServiceMock) SetGetGame(f func(uint64) (*domain.Game, errorUtils.EntityError)) {
-	u.getGameService = f
-}
-
-func (u *gameServiceMock) SetCreateGame(f func(*domain.Game) (*domain.Game, errorUtils.EntityError)) {
-	u.createGameService = f
-}
-
-func (u *gameServiceMock) SetUpdateGame(f func(*domain.Game) (*domain.Game, errorUtils.EntityError)) {
-	u.updateGameService = f
-}
-
-func (u *gameServiceMock) SetDelete(f func(uint64) errorUtils.EntityError) {
-	u.deleteGameService = f
-}
-
-func (u *gameServiceMock) SetGetAll(f func() ([]domain.Game, errorUtils.EntityError)) {
-	u.getAllGameService = f
-}
-
 type GameControllerTestSuite struct {
 	suite.Suite
-	mockService GameServiceMockInterface
-	r *gin.Engine
-	rr *httptest.ResponseRecorder
-
+	mockService mocks.GameServiceMockInterface
+	r           *gin.Engine
+	rr          *httptest.ResponseRecorder
 }
 
-func TestGamesControllerTestSuite(t *testing.T){
+func TestGamesControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(GameControllerTestSuite))
 }
 
 func (s *GameControllerTestSuite) SetupSuite() {
-	mock := &gameServiceMock{}
+	mock := &mocks.GameServiceMock{}
 	s.mockService = mock
 	services.GamesService = mock
 	s.r = gin.Default()
@@ -146,7 +89,7 @@ func (s *GameControllerTestSuite) TestGetGame_NotFound() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusNotFound, apiErr.Status())
@@ -163,7 +106,7 @@ func (s *GameControllerTestSuite) TestGetGame_DatabaseError() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusInternalServerError, apiErr.Status())
@@ -190,7 +133,7 @@ func (s *GameControllerTestSuite) TestCreateGame_Success() {
 
 	var game domain.Game
 	err = json.Unmarshal(s.rr.Body.Bytes(), &game)
-	t:= s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, game)
 	assert.EqualValues(t, http.StatusCreated, s.rr.Code)
@@ -209,7 +152,7 @@ func (s *GameControllerTestSuite) TestCreateGame_InvalidJsonBadFieldType() {
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -226,7 +169,7 @@ func (s *GameControllerTestSuite) TestCreateGame_InvalidJsonMissingField() {
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -281,14 +224,14 @@ func (s *GameControllerTestSuite) TestUpdateGame_InvalidId() {
 func (s *GameControllerTestSuite) TestUpdateGame_InvalidJsonFieldMissing() {
 	//here we puroposely put a typo in 'title' field name. we expect it to return us an invalid JSON error
 	jsonBody := `{"titl":"Rocket League", "developer":"Psyonix", "publisher":"Psyonix"}`
-	id:="1"
+	id := "1"
 	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -299,14 +242,14 @@ func (s *GameControllerTestSuite) TestUpdateGame_InvalidJsonFieldMissing() {
 func (s *GameControllerTestSuite) TestUpdateGame_InvalidJsonBadFieldType() {
 	//here we put a number instead of a string for the title. we expect an invalid json error
 	jsonBody := `{"title":123456, "developer":"Psyonix", "publisher":"Psyonix"}`
-	id:="1"
+	id := "1"
 	req, err := http.NewRequest(http.MethodPatch, "/games/"+id, bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -328,7 +271,7 @@ func (s *GameControllerTestSuite) TestUpdateGame_ErrorUpdating() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error updating game", apiErr.Message())
@@ -375,7 +318,7 @@ func (s *GameControllerTestSuite) TestDeleteGame_Failure() {
 	s.mockService.SetDelete(func(u uint64) errorUtils.EntityError {
 		return errorUtils.NewInternalServerError("error deleting game")
 	})
-	id:="1"
+	id := "1"
 	req, err := http.NewRequest(http.MethodDelete, "/games/"+id, nil)
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -383,7 +326,7 @@ func (s *GameControllerTestSuite) TestDeleteGame_Failure() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error deleting game", apiErr.Message())
@@ -422,7 +365,7 @@ func (s *GameControllerTestSuite) TestGetAllGames_Success() {
 	if theErr != nil {
 		s.T().Errorf("could not unmarshal response: %v\n", theErr)
 	}
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, games)
 	assert.EqualValues(t, 1, games[0].ID)
@@ -446,11 +389,10 @@ func (s *GameControllerTestSuite) TestGetAllGames_Failure() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error getting games", apiErr.Message())
 	assert.EqualValues(t, "server_error", apiErr.Error())
 	assert.EqualValues(t, http.StatusInternalServerError, apiErr.Status())
 }
-

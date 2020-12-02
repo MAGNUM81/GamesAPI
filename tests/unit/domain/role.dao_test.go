@@ -14,8 +14,8 @@ import (
 
 type UserRoleTestSuite struct {
 	suite.Suite
-	DB   	   *gorm.DB
-	mock 	   sqlmock.Sqlmock
+	DB   *gorm.DB
+	mock sqlmock.Sqlmock
 
 	repository domain.UserRoleRepoInterface
 	userRole   *domain.UserRole
@@ -39,7 +39,7 @@ func (s *UserRoleTestSuite) BeforeTest(_, _ string) {
 	s.repository = domain.NewUserRoleRepository(s.DB)
 }
 
-func(s *UserRoleTestSuite) TearDownTest() {
+func (s *UserRoleTestSuite) TearDownTest() {
 	s.DB.Close()
 }
 
@@ -74,14 +74,14 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_GetAll_NotEmpty() {
 	assert.NotNil(s.T(), data)
 	expected := []domain.UserRole{
 		{
-			ID:        1,
-			UserID:    1,
-			Name:      "Admin",
+			ID:     1,
+			UserID: 1,
+			Name:   "Admin",
 		},
 		{
-			ID: 		 2,
-			UserID:    2,
-			Name:      "User",
+			ID:     2,
+			UserID: 2,
+			Name:   "User",
 		},
 	}
 
@@ -111,9 +111,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_GetByID_OneValidRow() {
 	require.True(s.T(), err == nil)
 
 	expected := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 
 	assert.Equal(s.T(), expected, userRole)
@@ -152,9 +152,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_GetByRoleName_OneValidRow() {
 	require.True(s.T(), err == nil)
 
 	expected := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 
 	assert.Equal(s.T(), expected, userRole)
@@ -193,9 +193,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_GetByUserID_OneValidRow() {
 	require.True(s.T(), err == nil)
 
 	expected := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 
 	assert.Equal(s.T(), expected, userRole)
@@ -226,8 +226,6 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_Update_NotExist() {
 	require.True(s.T(), userRole == nil)
 }
 
-
-
 //Test for updating an existing userRole
 func (s *UserRoleTestSuite) TestUserRoleRepo_Update_Exists() {
 	selectRows := sqlmock.NewRows([]string{"id", "user_id", "roleName"}).
@@ -239,9 +237,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_Update_Exists() {
 	s.mock.ExpectExec(sqlUpdate).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.mock.ExpectCommit()
 	expected := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 	userRole, err := s.repository.Update(expected)
 	require.True(s.T(), err == nil)
@@ -255,9 +253,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_Insert_Succeeds() {
 	s.mock.ExpectCommit()
 
 	expected := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 	created, err := s.repository.Create(expected)
 
@@ -275,9 +273,9 @@ func (s *UserRoleTestSuite) TestUserRoleRepo_Insert_Fails() {
 	s.mock.ExpectCommit()
 
 	input := &domain.UserRole{
-		ID:        1,
-		UserID:    1,
-		Name:      "Admin",
+		ID:     1,
+		UserID: 1,
+		Name:   "Admin",
 	}
 	created, err := s.repository.Create(input)
 

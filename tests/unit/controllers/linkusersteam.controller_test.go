@@ -20,19 +20,19 @@ import (
 
 type LinkSteamUserTestSuite struct {
 	suite.Suite
-	mockUserService mocks.UserServiceMockInterface
+	mockUserService  mocks.UserServiceMockInterface
 	mockSteamService mocks.SteamUserMockInterface
-	r *gin.Engine
-	rr *httptest.ResponseRecorder
+	r                *gin.Engine
+	rr               *httptest.ResponseRecorder
 }
 
-func TestLinkSteamUsersControllerTestSuite(t *testing.T){
+func TestLinkSteamUsersControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(LinkSteamUserTestSuite))
 }
 
 func (s *LinkSteamUserTestSuite) SetupSuite() {
 	mock := &mocks.UserServiceMock{}
-	steammock :=&mocks.SteamUserMock{}
+	steammock := &mocks.SteamUserMock{}
 	s.mockSteamService = steammock
 	s.mockUserService = mock
 	Steam.ExternalSteamUserService = steammock
@@ -113,16 +113,16 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_ValidSteamId() {
 	})
 
 	usersteamid := "gabelogannewell"
-	s.mockSteamService.SetGetUserID(func(usersteamid string) (string, error){
+	s.mockSteamService.SetGetUserID(func(usersteamid string) (string, error) {
 		return "12345678911234567", nil
 	})
-
 
 	jsonBody := bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/id/%s", "userid":1}`, usersteamid))
 	req, _ := http.NewRequest(http.MethodPost, "/", jsonBody)
 	s.r.ServeHTTP(s.rr, req)
 
-	assert.EqualValues(s.T(), 200, s.rr.Code)}
+	assert.EqualValues(s.T(), 200, s.rr.Code)
+}
 
 func (s *LinkSteamUserTestSuite) TestLinkUserSteam_invalidSteamId() {
 	s.mockUserService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
@@ -142,16 +142,16 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_invalidSteamId() {
 	})
 
 	usersteamid := "gabelogannewell"
-	s.mockSteamService.SetGetUserID(func(usersteamid string) (string, error){
+	s.mockSteamService.SetGetUserID(func(usersteamid string) (string, error) {
 		return "", errors.New("error steam id invalid")
 	})
-
 
 	jsonBody := bytes.NewBufferString(fmt.Sprintf(`{"profile_url":"https://steamcommunity.com/id/%s", "userid":1}`, usersteamid))
 	req, _ := http.NewRequest(http.MethodPost, "/", jsonBody)
 	s.r.ServeHTTP(s.rr, req)
 
-	assert.EqualValues(s.T(), 500 , s.rr.Code)}
+	assert.EqualValues(s.T(), 500, s.rr.Code)
+}
 
 // steam url  component id or profile is empty
 func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidValidateUrl_null() {
@@ -234,6 +234,7 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidValidateUrl_len() {
 	assert.EqualValues(s.T(), 400, s.rr.Code)
 
 }
+
 // steam url id or profile is not the 4 componant
 func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidValidateUrl_component_notfound() {
 	s.mockUserService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
@@ -262,18 +263,15 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidValidateUrl_component_
 
 }
 
-
-
 func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidGetUserid() {
 	expectedErr := errorUtils.NewInternalServerError("error getting users")
 	s.mockUserService.SetGetUser(func(id uint64) (*domain.User, errorUtils.EntityError) {
 		return nil, expectedErr
 	})
 
-
 	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
-			ID:   1 ,
+			ID:    1,
 			Name:  "dev",
 			Email: "dev@test.ru",
 		}, nil
@@ -297,7 +295,6 @@ func (s *LinkSteamUserTestSuite) TestLinkUserSteam_InvalidUpdateUser() {
 			Email: "dev@test.com",
 		}, nil
 	})
-
 
 	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return nil, expectedErr

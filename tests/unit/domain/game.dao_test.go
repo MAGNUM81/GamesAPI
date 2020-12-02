@@ -13,11 +13,10 @@ import (
 	"testing"
 )
 
-
 type GameTestSuite struct {
 	suite.Suite
-	DB   	   *gorm.DB
-	mock 	   sqlmock.Sqlmock
+	DB   *gorm.DB
+	mock sqlmock.Sqlmock
 
 	repository domain.GameRepoInterface
 	game       *domain.Game
@@ -41,7 +40,7 @@ func (s *GameTestSuite) BeforeTest(_, _ string) {
 	s.repository = domain.NewGameRepository(s.DB)
 }
 
-func(s *GameTestSuite) TearDownTest() {
+func (s *GameTestSuite) TearDownTest() {
 	s.DB.Close()
 }
 
@@ -76,14 +75,14 @@ func (s *GameTestSuite) TestGameRepo_GetAll_NotEmpty() {
 	assert.NotNil(s.T(), data)
 	expected := []domain.Game{
 		{
-			ID: 		 1,
+			ID:          1,
 			Title:       "Rocket League",
 			Developer:   "Psyonix",
 			Publisher:   "Psyonix",
 			ReleaseDate: utils.GetDate("2015-07-07"),
 		},
 		{
-			ID: 		 2,
+			ID:          2,
 			Title:       "The Witcher 3: Wild Hunt",
 			Developer:   "CD PROJEKT RED",
 			Publisher:   "CD PROJEKT RED",
@@ -117,10 +116,10 @@ func (s *GameTestSuite) TestGameRepo_Get_OneValidRow() {
 	require.True(s.T(), err == nil)
 
 	expected := &domain.Game{
-		ID:    1,
-		Title:  "Rocket League",
-		Publisher: "Psyonix",
-		Developer: "Psyonix",
+		ID:          1,
+		Title:       "Rocket League",
+		Publisher:   "Psyonix",
+		Developer:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 
@@ -163,10 +162,10 @@ func (s *GameTestSuite) TestGameRepo_Update_Exists() {
 	s.mock.ExpectExec(sqlUpdate).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.mock.ExpectCommit()
 	expected := &domain.Game{
-		ID:    1,
-		Title:  "Rocket League",
-		Publisher: "Psyonix",
-		Developer: "Psyonix",
+		ID:          1,
+		Title:       "Rocket League",
+		Publisher:   "Psyonix",
+		Developer:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	game, err := s.repository.Update(expected)
@@ -181,9 +180,9 @@ func (s *GameTestSuite) TestGameRepo_Insert_Succeeds() {
 	s.mock.ExpectCommit()
 
 	expected := &domain.Game{
-		Title:  "Rocket League",
-		Publisher: "Psyonix",
-		Developer: "Psyonix",
+		Title:       "Rocket League",
+		Publisher:   "Psyonix",
+		Developer:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	created, err := s.repository.Create(expected)
@@ -204,9 +203,9 @@ func (s *GameTestSuite) TestGameRepo_Insert_Fails() {
 	s.mock.ExpectCommit()
 
 	input := &domain.Game{
-		Title:  "dev",
-		Publisher: "dev@test.com",
-		Developer: "Psyonix",
+		Title:       "dev",
+		Publisher:   "dev@test.com",
+		Developer:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
 	}
 	created, err := s.repository.Create(input)

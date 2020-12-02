@@ -17,14 +17,12 @@ import (
 	"testing"
 )
 
-
-
 type AuthTestSuite struct {
 	suite.Suite
-	mockAuthService mocks.AuthorizationServiceMockInterface
+	mockAuthService     mocks.AuthorizationServiceMockInterface
 	mockUserRoleService mocks.UserRoleServiceMockInterface
-	r *gin.Engine
-	rr *httptest.ResponseRecorder
+	r                   *gin.Engine
+	rr                  *httptest.ResponseRecorder
 }
 
 func TestAuthMiddlewareTestSuite(t *testing.T) {
@@ -47,10 +45,10 @@ func (s *AuthTestSuite) SetupSuite() {
 }
 
 func BidonController(c *gin.Context) {
-	c.JSON(200, gin.H{"message" : "ok"})
+	c.JSON(200, gin.H{"message": "ok"})
 }
 
-func (s *AuthTestSuite) BeforeTest(_,_ string) {
+func (s *AuthTestSuite) BeforeTest(_, _ string) {
 	s.rr = httptest.NewRecorder()
 }
 
@@ -84,9 +82,9 @@ func (s *AuthTestSuite) TestAuth_BadResource() {
 	s.mockUserRoleService.SetGetRolesByUserID(func(userId uint64) ([]domain.UserRole, errorUtils.EntityError) {
 		return []domain.UserRole{
 			{
-				ID:        1,
-				UserID:    1,
-				Name:      "Admin",
+				ID:     1,
+				UserID: 1,
+				Name:   "Admin",
 			},
 		}, nil
 	})
@@ -103,9 +101,9 @@ func (s *AuthTestSuite) TestAuth_BadEndpoint() {
 	s.mockUserRoleService.SetGetRolesByUserID(func(userId uint64) ([]domain.UserRole, errorUtils.EntityError) {
 		return []domain.UserRole{
 			{
-				ID:        1,
-				UserID:    1,
-				Name:      "Admin",
+				ID:     1,
+				UserID: 1,
+				Name:   "Admin",
 			},
 		}, nil
 	})
@@ -122,9 +120,9 @@ func (s *AuthTestSuite) TestAuth_ForbiddenAccess() {
 	s.mockUserRoleService.SetGetRolesByUserID(func(userId uint64) ([]domain.UserRole, errorUtils.EntityError) {
 		return []domain.UserRole{
 			{
-				ID:        1,
-				UserID:    1,
-				Name:      "User",
+				ID:     1,
+				UserID: 1,
+				Name:   "User",
 			},
 		}, nil
 	})
@@ -146,9 +144,9 @@ func (s *AuthTestSuite) TestAuth_GrantedAccess() {
 	s.mockUserRoleService.SetGetRolesByUserID(func(userId uint64) ([]domain.UserRole, errorUtils.EntityError) {
 		return []domain.UserRole{
 			{
-				ID:        1,
-				UserID:    1,
-				Name:      "Admin",
+				ID:     1,
+				UserID: 1,
+				Name:   "Admin",
 			},
 		}, nil
 	})

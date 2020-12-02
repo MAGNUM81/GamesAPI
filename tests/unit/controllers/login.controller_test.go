@@ -18,14 +18,14 @@ import (
 
 type LoginControllerTestSuite struct {
 	suite.Suite
-	mockUsersService mocks.UserServiceMockInterface
-	mockUserSessionService mocks.UserSessionServiceMockInterface
+	mockUsersService          mocks.UserServiceMockInterface
+	mockUserSessionService    mocks.UserSessionServiceMockInterface
 	mockAuthenticationService mocks.AuthenticationServiceMockInterface
-	r *gin.Engine
-	rr *httptest.ResponseRecorder
+	r                         *gin.Engine
+	rr                        *httptest.ResponseRecorder
 }
 
-func TestLoginControllerTestSuite(t *testing.T)  {
+func TestLoginControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(LoginControllerTestSuite))
 }
 
@@ -210,5 +210,3 @@ func (s *LoginControllerTestSuite) TestLogin_Success() {
 	//check if we got the token back in the response
 	assert.Equal(t, "some_token", s.rr.Header().Get("Authorization"))
 }
-
-

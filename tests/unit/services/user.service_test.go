@@ -4,7 +4,7 @@ import (
 	"GamesAPI/src/domain"
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils/errorUtils"
-	"github.com/jinzhu/gorm"
+	"GamesAPI/tests/unit/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"net/http"
@@ -14,67 +14,11 @@ import (
 
 var (
 	tm = time.Now()
-
 )
-
-type UserRepoMockInterface interface {
-	SetGetUserDomain(func(uint64) (*domain.User, errorUtils.EntityError))
-	SetCreateUserDomain(func(user *domain.User) (*domain.User, errorUtils.EntityError))
-	SetUpdateUserDomain(func(user *domain.User) (*domain.User, errorUtils.EntityError))
-	SetDeleteUserDomain(func(id uint64) errorUtils.EntityError)
-	SetGetAllUserDomain(func() ([]domain.User, errorUtils.EntityError))
-}
-
-type userRepoMock struct {
-	getUserDomain func(id uint64) (*domain.User, errorUtils.EntityError)
-	createUserDomain func(user *domain.User) (*domain.User, errorUtils.EntityError)
-	updateUserDomain func(user *domain.User) (*domain.User, errorUtils.EntityError)
-	deleteUserDomain func(id uint64) errorUtils.EntityError
-	getAllUsersDomain func() ([]domain.User, errorUtils.EntityError)
-}
-
-//UserRepoMockInterface implementation, so we can swap the methods around and get the desired behavior from the repository
-func (m *userRepoMock) SetGetUserDomain(f func(uint64) (*domain.User, errorUtils.EntityError)) {
-	m.getUserDomain = f
-}
-
-func (m *userRepoMock) SetCreateUserDomain(f func(user *domain.User) (*domain.User, errorUtils.EntityError)) {
-	m.createUserDomain = f
-}
-
-func (m *userRepoMock) SetUpdateUserDomain(f func(user *domain.User) (*domain.User, errorUtils.EntityError)) {
-	m.updateUserDomain = f
-}
-
-func (m *userRepoMock) SetDeleteUserDomain(f func(id uint64) errorUtils.EntityError) {
-	m.deleteUserDomain = f
-}
-
-func (m *userRepoMock) SetGetAllUserDomain(f func() ([]domain.User, errorUtils.EntityError)) {
-	m.getAllUsersDomain = f
-}
-
-//UserRepoInterface implementation (redirects all calls to the swappable methods)
-func (m *userRepoMock) Get(id uint64) (*domain.User, errorUtils.EntityError){
-	return m.getUserDomain(id)
-}
-func (m *userRepoMock) Create(msg *domain.User) (*domain.User, errorUtils.EntityError){
-	return m.createUserDomain(msg)
-}
-func (m *userRepoMock) Update(msg *domain.User) (*domain.User, errorUtils.EntityError){
-	return m.updateUserDomain(msg)
-}
-func (m *userRepoMock) Delete(id uint64) errorUtils.EntityError {
-	return m.deleteUserDomain(id)
-}
-func (m *userRepoMock) GetAll() ([]domain.User, errorUtils.EntityError) {
-	return m.getAllUsersDomain()
-}
-func (m *userRepoMock) Initialize(_ *gorm.DB) {}
 
 type UserServiceTestSuite struct {
 	suite.Suite
-	mockRepository UserRepoMockInterface
+	mockRepository mocks.UserRepoMockInterface
 }
 
 func TestUserServiceTestSuite(t *testing.T) {
@@ -82,7 +26,7 @@ func TestUserServiceTestSuite(t *testing.T) {
 }
 
 func (s *UserServiceTestSuite) SetupSuite() {
-	mock := &userRepoMock{}
+	mock := &mocks.UserRepoMock{}
 
 	s.mockRepository = mock //set this so we can swap the methods
 	domain.UserRepo = mock  //set this so the tested code calls the swapped methods
@@ -119,17 +63,17 @@ func (s *UserServiceTestSuite) TestUsersService_GetUser_NotFound() {
 
 func (s *UserServiceTestSuite) TestUsersService_CreateUser_Success() {
 	expectedUser := &domain.User{
-		ID: 1,
-		Email: "dev@test.com",
-		Name: "dev",
+		ID:        1,
+		Email:     "dev@test.com",
+		Name:      "dev",
 		CreatedAt: tm,
 	}
 	s.mockRepository.SetCreateUserDomain(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return expectedUser, nil
 	})
 	request := &domain.User{
-		Email: "dev@test.com",
-		Name: "dev",
+		Email:     "dev@test.com",
+		Name:      "dev",
 		CreatedAt: tm,
 	}
 	user, err := services.UsersService.CreateUser(request)
@@ -140,29 +84,29 @@ func (s *UserServiceTestSuite) TestUsersService_CreateUser_Success() {
 
 func (s *UserServiceTestSuite) TestUsersService_CreateUser_InvalidRequest() {
 	tests := []struct {
-		request *domain.User
+		request       *domain.User
 		expectedError errorUtils.EntityError
 	}{
 		{
 			request: &domain.User{
-				Name:     "",
-				Email:      "dev@test.com",
+				Name:      "",
+				Email:     "dev@test.com",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User name cannot be empty"),
 		},
 		{
 			request: &domain.User{
-				Name:     "dev",
-				Email:      "",
+				Name:      "dev",
+				Email:     "",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User email cannot be empty"),
 		},
 		{
 			request: &domain.User{
-				Name:     "dev",
-				Email:      "badly_formatted_email",
+				Name:      "dev",
+				Email:     "badly_formatted_email",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User email is not formatted correctly"),
@@ -184,9 +128,9 @@ func (s *UserServiceTestSuite) TestUsersService_CreateUser_Failure() {
 		return nil, expectedErr
 	})
 	request := &domain.User{
-		ID:    1,
-		Name:  "dev",
-		Email: "dev@test.com",
+		ID:        1,
+		Name:      "dev",
+		Email:     "dev@test.com",
 		CreatedAt: tm,
 	}
 	user, err := services.UsersService.CreateUser(request)
@@ -223,29 +167,29 @@ func (s *UserServiceTestSuite) TestUsersService_UpdateUser_Success() {
 
 func (s *UserServiceTestSuite) TestUsersService_UpdateUser_InvalidRequest() {
 	tests := []struct {
-		request *domain.User
+		request       *domain.User
 		expectedError errorUtils.EntityError
 	}{
 		{
 			request: &domain.User{
-				Name:     "",
-				Email:      "dev@test.com",
+				Name:      "",
+				Email:     "dev@test.com",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User name cannot be empty"),
 		},
 		{
 			request: &domain.User{
-				Name:     "dev",
-				Email:      "",
+				Name:      "dev",
+				Email:     "",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User email cannot be empty"),
 		},
 		{
 			request: &domain.User{
-				Name:     "dev",
-				Email:      "badly_formatted_email",
+				Name:      "dev",
+				Email:     "badly_formatted_email",
 				CreatedAt: tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("User email is not formatted correctly"),
@@ -294,7 +238,7 @@ func (s *UserServiceTestSuite) TestUsersService_UpdateUser_FailureUpdatingUser()
 		Email: "devAAA@test.com",
 	}
 	msg, err := services.UsersService.UpdateUser(request)
-	t:= s.T()
+	t := s.T()
 	assert.Nil(t, msg)
 	assert.NotNil(t, err)
 	assert.EqualValues(t, "error updating user", err.Message())
@@ -329,7 +273,7 @@ func (s *UserServiceTestSuite) TestUsersService_DeleteUser_ErrorGettingUser() {
 	assert.Equal(t, expectedError, err)
 }
 
-func (s *UserServiceTestSuite) TestUsersService_DeleteUser_ErrorDeletingUser(){
+func (s *UserServiceTestSuite) TestUsersService_DeleteUser_ErrorDeletingUser() {
 	expectedError := errorUtils.NewInternalServerError("error deleting message")
 	s.mockRepository.SetGetUserDomain(func(u uint64) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
@@ -352,19 +296,19 @@ func (s *UserServiceTestSuite) TestUsersService_GetAll_Success() {
 	s.mockRepository.SetGetAllUserDomain(func() ([]domain.User, errorUtils.EntityError) {
 		return []domain.User{
 			{
-				ID: 1,
+				ID:    1,
 				Email: "dev1@test.com",
-				Name: "dev1",
+				Name:  "dev1",
 			},
 			{
-				ID: 2,
+				ID:    2,
 				Email: "dev2@test.com",
-				Name: "dev2",
+				Name:  "dev2",
 			},
 			{
-				ID: 3,
+				ID:    3,
 				Email: "dev3@test.com",
-				Name: "dev3",
+				Name:  "dev3",
 			},
 		}, nil
 	})

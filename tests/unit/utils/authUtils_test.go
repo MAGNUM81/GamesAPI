@@ -38,5 +38,3 @@ func (s *AuthUtilsTestSuite) TestPasswordHashSymmetric() {
 	areEqual, _ := authUtils.CompareStrings(hash, pwdBytes)
 	require.True(s.T(), areEqual)
 }
-
-

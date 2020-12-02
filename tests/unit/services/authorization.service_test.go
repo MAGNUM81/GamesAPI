@@ -338,4 +338,3 @@ func (s *AuthorizationServiceTestSuite) TestRBAC_Authorize() {
 		})
 	}
 }
-
