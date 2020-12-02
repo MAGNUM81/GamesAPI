@@ -86,50 +86,6 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_Success() {
 	assert.Equal(s.T(), expectedGame, game)
 }
 
-func (s *GameServiceTestSuite) TestGamesService_CreateGame_InvalidRequest() {
-	tests := []struct {
-		request       *domain.Game
-		expectedError errorUtils.EntityError
-	}{
-		{
-			request: &domain.Game{
-				Title:       "",
-				Developer:   "Psyonix",
-				Publisher:   "Psyonix",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game title cannot be empty"),
-		},
-		{
-			request: &domain.Game{
-				Title:       "Rocket League",
-				Developer:   "",
-				Publisher:   "Psyonix",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game developer cannot be empty"),
-		},
-		{
-			request: &domain.Game{
-				Title:       "Rocket League",
-				Developer:   "Psyonix",
-				Publisher:   "",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty"),
-		},
-	}
-	for _, tt := range tests {
-		msg, err := services.GamesService.CreateGame(tt.request)
-		assert.Nil(s.T(), msg)
-		assert.NotNil(s.T(), err)
-		assert.Equal(s.T(), tt.expectedError, err)
-	}
-}
-
 func (s *GameServiceTestSuite) TestGamesService_UpdateGame_Success() {
 	before := &domain.Game{
 		ID:          1,
@@ -160,53 +116,6 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_Success() {
 	assert.Nil(s.T(), err)
 	assert.NotNil(s.T(), game)
 	assert.Equal(s.T(), expectedAfter, game)
-}
-
-func (s *GameServiceTestSuite) TestGamesService_UpdateGame_InvalidRequest() {
-	tests := []struct {
-		request       *domain.Game
-		expectedError errorUtils.EntityError
-	}{
-		{
-			request: &domain.Game{
-				ID:          1,
-				Title:       "",
-				Developer:   "Psyonix",
-				Publisher:   "Psyonix",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game title cannot be empty"),
-		},
-		{
-			request: &domain.Game{
-				ID:          1,
-				Title:       "Rocket League",
-				Developer:   "",
-				Publisher:   "Psyonix",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game developer cannot be empty"),
-		},
-		{
-			request: &domain.Game{
-				ID:          1,
-				Title:       "Rocket League",
-				Developer:   "Psyonix",
-				Publisher:   "",
-				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt:   tm,
-			},
-			expectedError: errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty"),
-		},
-	}
-	for _, tt := range tests {
-		msg, err := services.GamesService.UpdateGame(tt.request)
-		assert.Nil(s.T(), msg)
-		assert.NotNil(s.T(), err)
-		assert.Equal(s.T(), tt.expectedError, err)
-	}
 }
 
 func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureGettingFormerGame() {
