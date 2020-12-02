@@ -46,6 +46,8 @@ func SyncGamesHandler(c *gin.Context) {
 		AbortWithStatusError(c, http.StatusInternalServerError, err)
 	}
 
+	gameCount := 0
+	errCount := 0
 	for _, gameId := range gameIds {
 		existsGameWithSteamId, errExists := services.GamesService.ExistsWithSteamID(gameId)
 		if errExists != nil {
@@ -55,17 +57,23 @@ func SyncGamesHandler(c *gin.Context) {
 		if !existsGameWithSteamId {
 			g, err := Steam.ExternalSteamUserService.GetGameInfo(gameId)
 			if err != nil {
-				AbortWithStatusError(c, http.StatusInternalServerError, err)
-				return
+				errCount += 1
+				continue
 			}
 			_, errCreate := services.GamesService.CreateGame(&g)
 			if errCreate != nil {
+				println(gameCount)
 				AbortWithStatusError(c, errCreate.Status(), errCreate)
 				return
+			} else {
+				gameCount += 1
 			}
 		}
-		c.JSON(http.StatusOK, nil)
 	}
+
+	c.JSON(http.StatusOK, gin.H{"number of games inserted" : gameCount,
+								"number of games errored"  : errCount,
+								"number of games skipped"  : len(gameIds)-gameCount-errCount})
 }
 
 func AbortWithStatusError(c *gin.Context, code int, err error) {
