@@ -6,8 +6,8 @@ import (
 )
 
 type Permission struct {
-	Allow bool 		 `yaml:"allow"`
-	Ensure Ensurer	 `yaml:"ensure,omitempty"`
+	Allow   bool     `yaml:"allow"`
+	Ensure  Ensurer  `yaml:"ensure,omitempty"`
 	Enforce Enforcer `yaml:"enforce,omitempty"`
 }
 

@@ -23,8 +23,7 @@ type UserSessionServiceInterface interface {
 	GetSession(key string) (*domain.UserSession, errorUtils.EntityError)
 }
 
-
-type userSessionService struct {}
+type userSessionService struct{}
 
 func (u *userSessionService) GetSession(key string) (*domain.UserSession, errorUtils.EntityError) {
 	return domain.UserSessionRepo.Get(key)
@@ -33,11 +32,11 @@ func (u *userSessionService) GetSession(key string) (*domain.UserSession, errorU
 func (u *userSessionService) GenerateSessionToken(userId uint64, expireAt time.Time) (string, error) {
 	h := fnv.New32a()
 	// add both values as bytes to a buffer big enough to contain them
-	buf := make([]byte, binary.MaxVarintLen64 + binary.MaxVarintLen64)
+	buf := make([]byte, binary.MaxVarintLen64+binary.MaxVarintLen64)
 	n := binary.PutUvarint(buf, userId)
 	m := binary.PutVarint(buf, expireAt.UnixNano())
 	//take the resulting slice
-	b := buf[:(n+m)]
+	b := buf[:(n + m)]
 	//hash it
 	_, err := h.Write(b)
 	return strconv.Itoa(int(h.Sum32())), err
@@ -48,7 +47,7 @@ func (u *userSessionService) CreateSession(token *domain.UserSession) (*domain.U
 		return nil, err
 	}
 
-	if domain.UserSessionRepo.Exists(token.Token){
+	if domain.UserSessionRepo.Exists(token.Token) {
 		return nil, errorUtils.NewUnprocessableEntityError(fmt.Sprintf("token with key %s already exists", token.Token))
 	}
 

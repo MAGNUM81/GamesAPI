@@ -8,4 +8,3 @@ import (
 func InitHomeRoutes(g *gin.RouterGroup) {
 	g.GET("/", controllers.Home)
 }
-

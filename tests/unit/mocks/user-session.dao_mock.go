@@ -6,15 +6,15 @@ import (
 )
 
 type UserSessionRepoMockInterface interface {
-	SetGet(   func(key string) (*domain.UserSession, errorUtils.EntityError))
-	SetCreate(func(key string, token *domain.UserSession)(*domain.UserSession, errorUtils.EntityError))
+	SetGet(func(key string) (*domain.UserSession, errorUtils.EntityError))
+	SetCreate(func(key string, token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError))
 	SetDelete(func(key string) errorUtils.EntityError)
 	SetExists(func(key string) bool)
 }
 
 type UserSessionRepoMock struct {
-	get func(key string) (*domain.UserSession, errorUtils.EntityError)
-	create func(key string, token *domain.UserSession)(*domain.UserSession, errorUtils.EntityError)
+	get    func(key string) (*domain.UserSession, errorUtils.EntityError)
+	create func(key string, token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError)
 	delete func(key string) errorUtils.EntityError
 	exists func(key string) bool
 }
@@ -47,6 +47,6 @@ func (m *UserSessionRepoMock) SetExists(f func(key string) bool) {
 	m.exists = f
 }
 
-func (m *UserSessionRepoMock) SetGet(f func(key string) (*domain.UserSession, errorUtils.EntityError))  {
+func (m *UserSessionRepoMock) SetGet(f func(key string) (*domain.UserSession, errorUtils.EntityError)) {
 	m.get = f
 }

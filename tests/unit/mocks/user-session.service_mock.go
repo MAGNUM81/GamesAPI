@@ -16,12 +16,12 @@ type UserSessionServiceMockInterface interface {
 }
 
 type UserSessionServiceMock struct {
-	getSession func(key string) (*domain.UserSession, errorUtils.EntityError)
+	getSession           func(key string) (*domain.UserSession, errorUtils.EntityError)
 	generateSessionToken func(userId uint64, expireAt time.Time) (string, error)
-	createSession func(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError)
-	isSessionExpired func(key string, currentTime time.Time) (bool, errorUtils.EntityError)
-	existsSession func(key string) bool
-	deleteSession func(key string) errorUtils.EntityError
+	createSession        func(token *domain.UserSession) (*domain.UserSession, errorUtils.EntityError)
+	isSessionExpired     func(key string, currentTime time.Time) (bool, errorUtils.EntityError)
+	existsSession        func(key string) bool
+	deleteSession        func(key string) errorUtils.EntityError
 }
 
 func (m *UserSessionServiceMock) GetSession(key string) (*domain.UserSession, errorUtils.EntityError) {

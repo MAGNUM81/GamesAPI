@@ -5,71 +5,16 @@ import (
 	"GamesAPI/src/services"
 	"GamesAPI/src/utils"
 	"GamesAPI/src/utils/errorUtils"
-	"github.com/jinzhu/gorm"
+	"GamesAPI/tests/unit/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"testing"
 )
 
-type GameRepoMockInterface interface {
-	SetGetGameDomain(func(uint64) (*domain.Game, errorUtils.EntityError))
-	SetCreateGameDomain(func(game *domain.Game) (*domain.Game, errorUtils.EntityError))
-	SetUpdateGameDomain(func(game *domain.Game) (*domain.Game, errorUtils.EntityError))
-	SetDeleteGameDomain(func(id uint64) errorUtils.EntityError)
-	SetGetAllGameDomain(func() ([]domain.Game, errorUtils.EntityError))
-}
-
-type gameRepoMock struct {
-	getGameDomain func(id uint64) (*domain.Game, errorUtils.EntityError)
-	createGameDomain func(game *domain.Game) (*domain.Game, errorUtils.EntityError)
-	updateGameDomain func(game *domain.Game) (*domain.Game, errorUtils.EntityError)
-	deleteGameDomain func(id uint64) errorUtils.EntityError
-	getAllGamesDomain func() ([]domain.Game, errorUtils.EntityError)
-}
-
-//GameRepoMockInterface implementation, so we can swap the methods around and get the desired behavior from the repository
-func (m *gameRepoMock) SetGetGameDomain(f func(uint64) (*domain.Game, errorUtils.EntityError)) {
-	m.getGameDomain = f
-}
-
-func (m *gameRepoMock) SetCreateGameDomain(f func(game *domain.Game) (*domain.Game, errorUtils.EntityError)) {
-	m.createGameDomain = f
-}
-
-func (m *gameRepoMock) SetUpdateGameDomain(f func(game *domain.Game) (*domain.Game, errorUtils.EntityError)) {
-	m.updateGameDomain = f
-}
-
-func (m *gameRepoMock) SetDeleteGameDomain(f func(id uint64) errorUtils.EntityError) {
-	m.deleteGameDomain = f
-}
-
-func (m *gameRepoMock) SetGetAllGameDomain(f func() ([]domain.Game, errorUtils.EntityError)) {
-	m.getAllGamesDomain = f
-}
-
-//GameRepoInterface implementation (redirects all calls to the swappable methods)
-func (m *gameRepoMock) Get(id uint64) (*domain.Game, errorUtils.EntityError){
-	return m.getGameDomain(id)
-}
-func (m *gameRepoMock) Create(msg *domain.Game) (*domain.Game, errorUtils.EntityError){
-	return m.createGameDomain(msg)
-}
-func (m *gameRepoMock) Update(msg *domain.Game) (*domain.Game, errorUtils.EntityError){
-	return m.updateGameDomain(msg)
-}
-func (m *gameRepoMock) Delete(id uint64) errorUtils.EntityError {
-	return m.deleteGameDomain(id)
-}
-func (m *gameRepoMock) GetAll() ([]domain.Game, errorUtils.EntityError) {
-	return m.getAllGamesDomain()
-}
-func (m *gameRepoMock) Initialize(_ *gorm.DB) {}
-
 type GameServiceTestSuite struct {
 	suite.Suite
-	mockRepository GameRepoMockInterface
+	mockRepository mocks.GameRepoMockInterface
 }
 
 func TestGameServiceTestSuite(t *testing.T) {
@@ -77,7 +22,7 @@ func TestGameServiceTestSuite(t *testing.T) {
 }
 
 func (s *GameServiceTestSuite) SetupSuite() {
-	mock := &gameRepoMock{}
+	mock := &mocks.GameRepoMock{}
 
 	s.mockRepository = mock //set this so we can swap the methods
 	domain.GameRepo = mock  //set this so the tested code calls the swapped methods
@@ -91,7 +36,7 @@ func (s *GameServiceTestSuite) TestGamesService_GetGame_Success() {
 			Developer:   "Psyonix",
 			Publisher:   "Psyonix",
 			ReleaseDate: utils.GetDate("2015-07-07"),
-			CreatedAt: tm,
+			CreatedAt:   tm,
 		}, nil
 	})
 	game, err := services.GamesService.GetGame(1)
@@ -123,7 +68,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_Success() {
 		Developer:   "Psyonix",
 		Publisher:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
-		CreatedAt: tm,
+		CreatedAt:   tm,
 	}
 	s.mockRepository.SetCreateGameDomain(func(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
 		return expectedGame, nil
@@ -133,7 +78,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_Success() {
 		Developer:   "Psyonix",
 		Publisher:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
-		CreatedAt: tm,
+		CreatedAt:   tm,
 	}
 	game, err := services.GamesService.CreateGame(request)
 	assert.NotNil(s.T(), game)
@@ -143,7 +88,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_Success() {
 
 func (s *GameServiceTestSuite) TestGamesService_CreateGame_InvalidRequest() {
 	tests := []struct {
-		request *domain.Game
+		request       *domain.Game
 		expectedError errorUtils.EntityError
 	}{
 		{
@@ -152,7 +97,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_InvalidRequest() {
 				Developer:   "Psyonix",
 				Publisher:   "Psyonix",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game title cannot be empty"),
 		},
@@ -162,7 +107,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_InvalidRequest() {
 				Developer:   "",
 				Publisher:   "Psyonix",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game developer cannot be empty"),
 		},
@@ -172,7 +117,7 @@ func (s *GameServiceTestSuite) TestGamesService_CreateGame_InvalidRequest() {
 				Developer:   "Psyonix",
 				Publisher:   "",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty"),
 		},
@@ -192,7 +137,7 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_Success() {
 		Developer:   "Psyonix",
 		Publisher:   "Psyonix",
 		ReleaseDate: utils.GetDate("2015-07-07"),
-		CreatedAt: tm,
+		CreatedAt:   tm,
 	}
 	expectedAfter := &domain.Game{
 		ID:          1,
@@ -200,7 +145,7 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_Success() {
 		Developer:   "Psyonix After",
 		Publisher:   "Psyonix After",
 		ReleaseDate: utils.GetDate("2051-07-07"),
-		CreatedAt: tm,
+		CreatedAt:   tm,
 	}
 	s.mockRepository.SetGetGameDomain(func(u uint64) (*domain.Game, errorUtils.EntityError) {
 		return before, nil
@@ -219,39 +164,39 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_Success() {
 
 func (s *GameServiceTestSuite) TestGamesService_UpdateGame_InvalidRequest() {
 	tests := []struct {
-		request *domain.Game
+		request       *domain.Game
 		expectedError errorUtils.EntityError
 	}{
 		{
 			request: &domain.Game{
-				ID: 		 1,
+				ID:          1,
 				Title:       "",
 				Developer:   "Psyonix",
 				Publisher:   "Psyonix",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game title cannot be empty"),
 		},
 		{
 			request: &domain.Game{
-				ID: 		 1,
+				ID:          1,
 				Title:       "Rocket League",
 				Developer:   "",
 				Publisher:   "Psyonix",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game developer cannot be empty"),
 		},
 		{
 			request: &domain.Game{
-				ID: 		 1,
+				ID:          1,
 				Title:       "Rocket League",
 				Developer:   "Psyonix",
 				Publisher:   "",
 				ReleaseDate: utils.GetDate("2015-07-07"),
-				CreatedAt: tm,
+				CreatedAt:   tm,
 			},
 			expectedError: errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty"),
 		},
@@ -269,9 +214,9 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureGettingFormerG
 		return nil, errorUtils.NewInternalServerError("error getting game")
 	})
 	request := &domain.Game{
-		Title:       "Rocket League",
-		Developer:   "Psyonix",
-		Publisher:   "Psyonix",
+		Title:     "Rocket League",
+		Developer: "Psyonix",
+		Publisher: "Psyonix",
 	}
 	msg, err := services.GamesService.UpdateGame(request)
 	t := s.T()
@@ -285,10 +230,10 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureGettingFormerG
 func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureUpdatingGame() {
 	s.mockRepository.SetGetGameDomain(func(u uint64) (*domain.Game, errorUtils.EntityError) {
 		return &domain.Game{
-			ID:    1,
-			Title:       "Rocket League",
-			Developer:   "Psyonix",
-			Publisher:   "Psyonix",
+			ID:        1,
+			Title:     "Rocket League",
+			Developer: "Psyonix",
+			Publisher: "Psyonix",
 		}, nil
 	})
 	s.mockRepository.SetUpdateGameDomain(func(game *domain.Game) (*domain.Game, errorUtils.EntityError) {
@@ -296,13 +241,13 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureUpdatingGame()
 	})
 
 	request := &domain.Game{
-		ID:    1,
-		Title:       "Rocket League AAA",
-		Developer:   "Psyonix AAA",
-		Publisher:   "Psyonix AAA",
+		ID:        1,
+		Title:     "Rocket League AAA",
+		Developer: "Psyonix AAA",
+		Publisher: "Psyonix AAA",
 	}
 	msg, err := services.GamesService.UpdateGame(request)
-	t:= s.T()
+	t := s.T()
 	assert.Nil(t, msg)
 	assert.NotNil(t, err)
 	assert.EqualValues(t, "error updating game", err.Message())
@@ -313,10 +258,10 @@ func (s *GameServiceTestSuite) TestGamesService_UpdateGame_FailureUpdatingGame()
 func (s *GameServiceTestSuite) TestGamesService_DeleteGame_Success() {
 	s.mockRepository.SetGetGameDomain(func(u uint64) (*domain.Game, errorUtils.EntityError) {
 		return &domain.Game{
-			ID:    1,
-			Title:       "Rocket League",
-			Developer:   "Psyonix",
-			Publisher:   "Psyonix",
+			ID:        1,
+			Title:     "Rocket League",
+			Developer: "Psyonix",
+			Publisher: "Psyonix",
 		}, nil
 	})
 	s.mockRepository.SetDeleteGameDomain(func(_ uint64) errorUtils.EntityError {
@@ -338,14 +283,14 @@ func (s *GameServiceTestSuite) TestGamesService_DeleteGame_ErrorGettingGame() {
 	assert.Equal(t, expectedError, err)
 }
 
-func (s *GameServiceTestSuite) TestGamesService_DeleteGame_ErrorDeletingGame(){
+func (s *GameServiceTestSuite) TestGamesService_DeleteGame_ErrorDeletingGame() {
 	expectedError := errorUtils.NewInternalServerError("error deleting message")
 	s.mockRepository.SetGetGameDomain(func(u uint64) (*domain.Game, errorUtils.EntityError) {
 		return &domain.Game{
-			ID:    1,
-			Title:       "Rocket League",
-			Developer:   "Psyonix",
-			Publisher:   "Psyonix",
+			ID:        1,
+			Title:     "Rocket League",
+			Developer: "Psyonix",
+			Publisher: "Psyonix",
 		}, nil
 	})
 	s.mockRepository.SetDeleteGameDomain(func(id uint64) errorUtils.EntityError {
@@ -362,22 +307,22 @@ func (s *GameServiceTestSuite) TestGamesService_GetAll_Success() {
 	s.mockRepository.SetGetAllGameDomain(func() ([]domain.Game, errorUtils.EntityError) {
 		return []domain.Game{
 			{
-				ID: 1,
-				Title:       "Rocket League1",
-				Developer:   "Psyonix1",
-				Publisher:   "Psyonix1",
+				ID:        1,
+				Title:     "Rocket League1",
+				Developer: "Psyonix1",
+				Publisher: "Psyonix1",
 			},
 			{
-				ID: 2,
-				Title:       "Rocket League2",
-				Developer:   "Psyonix2",
-				Publisher:   "Psyonix2",
+				ID:        2,
+				Title:     "Rocket League2",
+				Developer: "Psyonix2",
+				Publisher: "Psyonix2",
 			},
 			{
-				ID: 3,
-				Title:       "Rocket League3",
-				Developer:   "Psyonix3",
-				Publisher:   "Psyonix3",
+				ID:        3,
+				Title:     "Rocket League3",
+				Developer: "Psyonix3",
+				Publisher: "Psyonix3",
 			},
 		}, nil
 	})

@@ -34,7 +34,7 @@ func GetUser(c *gin.Context) {
 
 func GetAllUsers(c *gin.Context) {
 	users, err := services.UsersService.GetAllUsers()
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -54,13 +54,13 @@ func CreateUser(c *gin.Context) {
 	}
 
 	/*
-	now we should expect a user to be created with this request body :
-	{
-		"name":"<name>"
-		"email" : "<email>"
-		"password" : "<password>"
-		"role" : "<roleName>"
-	}
+		now we should expect a user to be created with this request body :
+		{
+			"name":"<name>"
+			"email" : "<email>"
+			"password" : "<password>"
+			"role" : "<roleName>"
+		}
 	*/
 	name := body["name"]
 	email := body["email"]
@@ -69,7 +69,7 @@ func CreateUser(c *gin.Context) {
 	passwordHash, hashErr := authUtils.HashAndSalt([]byte(password))
 
 	if hashErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Error" : hashErr.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": hashErr.Error()})
 		return
 	}
 
@@ -80,7 +80,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	if err := user.Validate(); err != nil {
-		c.JSON(err.Status(), gin.H{"Error" : err.Error()})
+		c.JSON(err.Status(), gin.H{"Error": err.Error()})
 		return
 	}
 
@@ -90,18 +90,18 @@ func CreateUser(c *gin.Context) {
 	}
 
 	r, err := services.UserRoleService.CreateRole(&domain.UserRole{
-		UserID:    user.ID,
-		Name:      role,
+		UserID: user.ID,
+		Name:   role,
 	})
 
 	if err != nil {
-		c.JSON(err.Status(), gin.H{"Error" : err.Error()})
+		c.JSON(err.Status(), gin.H{"Error": err.Error()})
 		return
 	}
 
 	if r == nil {
 		//we should rollback our changes to the user table... the user won't have any role.
-		c.JSON(http.StatusInternalServerError, gin.H{"Error":"Could not create role for user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": "Could not create role for user"})
 		return
 	}
 
@@ -110,7 +110,7 @@ func CreateUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 	userId, err := getUserId(c.Param("id"))
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
 
@@ -131,10 +131,10 @@ func UpdateUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 	userId, err := getUserId(c.Param("id"))
-	if errorUtils.IsEntityError(c, err){
+	if errorUtils.IsEntityError(c, err) {
 		return
 	}
-	if err := services.UsersService.DeleteUser(userId); errorUtils.IsEntityError(c, err){
+	if err := services.UsersService.DeleteUser(userId); errorUtils.IsEntityError(c, err) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})

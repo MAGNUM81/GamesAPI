@@ -16,13 +16,13 @@ type UserRoleServiceMockInterface interface {
 }
 
 type UserRoleMock struct {
-	getRole func(userRoleId uint64) (*domain.UserRole, errorUtils.EntityError)
-	getRolesByUserID func(userId uint64) ([]domain.UserRole, errorUtils.EntityError)
+	getRole            func(userRoleId uint64) (*domain.UserRole, errorUtils.EntityError)
+	getRolesByUserID   func(userId uint64) ([]domain.UserRole, errorUtils.EntityError)
 	getRolesByRoleName func(roleName string) ([]domain.UserRole, errorUtils.EntityError)
-	createRole func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError)
-	updateRole func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError)
-	deleteRole func(roleId uint64) errorUtils.EntityError
-	getAllRoles func() ([]domain.UserRole, errorUtils.EntityError)
+	createRole         func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError)
+	updateRole         func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError)
+	deleteRole         func(roleId uint64) errorUtils.EntityError
+	getAllRoles        func() ([]domain.UserRole, errorUtils.EntityError)
 }
 
 func (u *UserRoleMock) SetGetRole(f func(userRoleId uint64) (*domain.UserRole, errorUtils.EntityError)) {
@@ -80,4 +80,3 @@ func (u *UserRoleMock) DeleteRole(roleId uint64) errorUtils.EntityError {
 func (u *UserRoleMock) GetAllRoles() ([]domain.UserRole, errorUtils.EntityError) {
 	return u.getAllRoles()
 }
-

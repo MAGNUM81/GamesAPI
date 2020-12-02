@@ -14,7 +14,7 @@ func abortWithError(c *gin.Context, code int, message string) {
 	c.AbortWithStatusJSON(code, gin.H{"Error": message})
 }
 
-func LoginController(c *gin.Context)  {
+func LoginController(c *gin.Context) {
 	authenticateHeader := strings.Trim(c.Request.Header.Get("Authorization"), " ")
 	parts := strings.Split(authenticateHeader, ";")
 	if authenticateHeader == "" || len(parts) != 2 {
@@ -85,6 +85,6 @@ func LoginController(c *gin.Context)  {
 
 	c.Header("Authorization", token)
 
-	c.JSON(http.StatusOK, gin.H{"Message" : fmt.Sprintf("User with email '%s' ID '%v' Successfully authenticated. " +
+	c.JSON(http.StatusOK, gin.H{"Message": fmt.Sprintf("User with email '%s' ID '%v' Successfully authenticated. "+
 		"Session token was sent in response's 'Authorization' header ", potentialUser.Email, potentialUser.ID)})
 }

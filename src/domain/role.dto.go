@@ -6,12 +6,12 @@ import (
 )
 
 type UserRole struct {
-	ID    	  uint64 `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint64     `gorm:"primary_key" json:"id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
-	UserID 	  uint64 `gorm:"column:user_id" json:"user_id"`
-	Name 	  string `gorm:"column:roleName" json:"name"`
+	UserID    uint64     `gorm:"column:user_id" json:"user_id"`
+	Name      string     `gorm:"column:roleName" json:"name"`
 }
 
 func (r *UserRole) Validate() errorUtils.EntityError {

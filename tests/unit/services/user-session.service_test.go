@@ -17,7 +17,7 @@ type UserSessionServiceTestSuite struct {
 	mockRepo mocks.UserSessionRepoMockInterface
 }
 
-func TestUserSessionServiceTestSuite(t  *testing.T) {
+func TestUserSessionServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(UserSessionServiceTestSuite))
 }
 
@@ -29,9 +29,9 @@ func (s *UserSessionServiceTestSuite) SetupSuite() {
 
 var (
 	testTimeNow = time.Now()
-	testTime = testTimeNow.UnixNano()
-	testUserId = uint64(42)
-	testToken = "1234"
+	testTime    = testTimeNow.UnixNano()
+	testUserId  = uint64(42)
+	testToken   = "1234"
 	testSession = &domain.UserSession{Token: testToken, UserId: testUserId, ExpiresAt: testTime}
 )
 
@@ -48,7 +48,7 @@ func (s *UserSessionServiceTestSuite) TestCreateSession_Success() {
 	})
 }
 
-func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_InvalidToken(){
+func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_InvalidToken() {
 	expected := errorUtils.NewUnprocessableEntityError("Token cannot be empty")
 	sesh, err := services.UserSessionService.CreateSession(&domain.UserSession{
 		Token:     "",
@@ -61,7 +61,7 @@ func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_InvalidToken(){
 	assert.Equal(s.T(), expected, err)
 }
 
-func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_TokenAlreadyExists(){
+func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_TokenAlreadyExists() {
 	expected := errorUtils.NewUnprocessableEntityError(fmt.Sprintf("token with key %s already exists", testToken))
 	s.mockRepo.SetExists(func(key string) bool {
 		return true
@@ -73,7 +73,7 @@ func (s *UserSessionServiceTestSuite) TestCreateSession_Failure_TokenAlreadyExis
 	assert.Equal(s.T(), expected, err)
 }
 
-func (s *UserSessionServiceTestSuite) TestExistsSession_Success(){
+func (s *UserSessionServiceTestSuite) TestExistsSession_Success() {
 	s.mockRepo.SetExists(func(key string) bool {
 		return true
 	})
@@ -82,7 +82,7 @@ func (s *UserSessionServiceTestSuite) TestExistsSession_Success(){
 	assert.Equal(s.T(), true, actual)
 }
 
-func (s *UserSessionServiceTestSuite) TestDeleteSession_Success(){
+func (s *UserSessionServiceTestSuite) TestDeleteSession_Success() {
 	s.mockRepo.SetExists(func(key string) bool {
 		return true
 	})
@@ -96,7 +96,7 @@ func (s *UserSessionServiceTestSuite) TestDeleteSession_Success(){
 	assert.Nil(s.T(), err)
 }
 
-func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure_NotFound(){
+func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure_NotFound() {
 	expected := errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", testToken))
 	s.mockRepo.SetExists(func(key string) bool {
 		return false
@@ -108,7 +108,7 @@ func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure_NotFound(){
 	assert.Equal(s.T(), expected, actual)
 }
 
-func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure_RepoError(){
+func (s *UserSessionServiceTestSuite) TestDeleteSession_Failure_RepoError() {
 	expected := errorUtils.NewInternalServerError("error when deleting session from repo")
 	s.mockRepo.SetExists(func(key string) bool {
 		return true
@@ -169,6 +169,3 @@ func (s *UserSessionServiceTestSuite) TestSessionExpired_Failure_SessionNotFound
 	assert.True(s.T(), expired)
 	assert.Equal(s.T(), expected, err)
 }
-
-
-

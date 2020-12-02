@@ -8,9 +8,9 @@ import (
 )
 
 type Rule struct {
-	Key		 string `yaml:"key"`
+	Key      string `yaml:"key"`
 	Operator string `yaml:"operator"`
-	Value 	 string `yaml:"value"`
+	Value    string `yaml:"value"`
 }
 
 //Strongly inspired from https://dev.to/bastianrob/rbac-in-rest-api-using-go-5gg0

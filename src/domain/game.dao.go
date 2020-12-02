@@ -68,4 +68,3 @@ func (g *gameRepo) GetAll() ([]Game, errorUtils.EntityError) {
 	g.db.Find(&games)
 	return games, nil
 }
-

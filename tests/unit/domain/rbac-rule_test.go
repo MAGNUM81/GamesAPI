@@ -101,7 +101,7 @@ func (s *rbacRuleTestSuite) TestRule_FromContext() {
 				"id": "IDX-0001",
 			})
 		},
-		want: errors.New("nested rule value is not a map or cannot be found"),
+		want:      errors.New("nested rule value is not a map or cannot be found"),
 		shouldErr: true,
 	}, {
 		given: "rule.Value with deep nested ctx, but does not exists", then: "code should throw err",
@@ -109,7 +109,7 @@ func (s *rbacRuleTestSuite) TestRule_FromContext() {
 		ctx: func() context.Context {
 			return context.Background()
 		},
-		want: errors.New("nested rule value is not a map or cannot be found"),
+		want:      errors.New("nested rule value is not a map or cannot be found"),
 		shouldErr: true,
 	}}
 	for _, tt := range tests {

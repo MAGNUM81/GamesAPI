@@ -17,14 +17,14 @@ import (
 )
 
 type UserSessionHandlerTestSuite struct {
-    suite.Suite
-    mockService mocks.UserSessionServiceMockInterface
-    r *gin.Engine
-    rr *httptest.ResponseRecorder
+	suite.Suite
+	mockService mocks.UserSessionServiceMockInterface
+	r           *gin.Engine
+	rr          *httptest.ResponseRecorder
 }
 
 func UserSessionBidonHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"Message" : "Success"})
+	c.JSON(http.StatusOK, gin.H{"Message": "Success"})
 }
 
 func (s *UserSessionHandlerTestSuite) BeforeTest(_, _ string) {
@@ -46,22 +46,22 @@ func (s *UserSessionHandlerTestSuite) SetupSuite() {
 }
 
 func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_NoAuthHeader() {
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
-	s.r.ServeHTTP(s.rr,req)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusBadRequest, s.rr.Code)
 }
 
 func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_BadAuthHeader1() {
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "This is a bad Auth Header")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusBadRequest, s.rr.Code)
 }
 
 func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_BadAuthHeader2() {
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer ")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusBadRequest, s.rr.Code)
 }
 
@@ -69,9 +69,9 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_SessionNotExists() 
 	s.mockService.SetExistsSession(func(key string) bool {
 		return false
 	})
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer 123456")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusUnauthorized, s.rr.Code)
 	responseWWWAuth := s.rr.Header().Get("Www-ValidatePassword")
 	assert.True(s.T(), responseWWWAuth != "")
@@ -85,9 +85,9 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_IsSessionExpired_Fa
 		return true, errorUtils.NewNotFoundError(fmt.Sprintf("token with key %s does not exist", key))
 	})
 
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer 123456")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusNotFound, s.rr.Code)
 }
 
@@ -99,9 +99,9 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_IsSessionExpired_Su
 		return true, nil
 	})
 
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer 123456")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusUnauthorized, s.rr.Code)
 	responseWWWAuth := s.rr.Header().Get("Www-ValidatePassword")
 	assert.True(s.T(), responseWWWAuth != "")
@@ -123,8 +123,8 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_SessionIsNotExpired
 		}, nil
 	})
 
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer 123456")
-	s.r.ServeHTTP(s.rr,req)
+	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusOK, s.rr.Code)
 }

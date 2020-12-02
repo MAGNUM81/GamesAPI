@@ -14,7 +14,7 @@ type UserServiceMockInterface interface {
 }
 
 type UserServiceMock struct {
-	getUserService func(uint64) (*domain.User, errorUtils.EntityError)
+	getUserService    func(uint64) (*domain.User, errorUtils.EntityError)
 	createUserService func(*domain.User) (*domain.User, errorUtils.EntityError)
 	updateUserService func(*domain.User) (*domain.User, errorUtils.EntityError)
 	deleteUserService func(uint64) errorUtils.EntityError

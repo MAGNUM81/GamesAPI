@@ -16,8 +16,7 @@ var (
 	ExternalSteamUserService ExternalSteamUserServiceInterface = &externalSteamUserService{}
 )
 
-type externalSteamUserService struct {}
-
+type externalSteamUserService struct{}
 
 type ExternalSteamUserServiceInterface interface {
 	GetUserID(personalURL string) (string, error)
@@ -25,7 +24,7 @@ type ExternalSteamUserServiceInterface interface {
 	GetGameInfo(gameID string) (domain.Game, error)
 }
 
-func getFromSteam(requestURL string) ([]byte, error){
+func getFromSteam(requestURL string) ([]byte, error) {
 	resp, err := http.Get(requestURL)
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
@@ -42,16 +41,16 @@ func (e externalSteamUserService) GetUserID(personalURL string) (string, error) 
 	var userinfo basicUserSteamType
 	json.Unmarshal(steamID, &userinfo)
 
-	if userinfo.Response.Success == 1{
+	if userinfo.Response.Success == 1 {
 		return userinfo.Response.Steamid, nil
 	} else {
-		return "",  errors.New("no match found")
+		return "", errors.New("no match found")
 	}
 }
 
 func (e externalSteamUserService) GetUserOwnedGames(userID string) ([]string, error){
 	key := os.Getenv("STEAMKEY")
-	ownedGamesInfo, err := getFromSteam("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key="+ key +"&steamid="+ userID +"&format=json")
+	ownedGamesInfo, err := getFromSteam("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + key + "&steamid=" + userID + "&format=json")
 	if err != nil {
 		return []string{""}, err
 	}
@@ -59,7 +58,7 @@ func (e externalSteamUserService) GetUserOwnedGames(userID string) ([]string, er
 	var userOwnedGames ownedGamesSteamType
 	json.Unmarshal(ownedGamesInfo, &userOwnedGames)
 
-	var usableSteamGameIDs []string;
+	var usableSteamGameIDs []string
 	for _, games := range userOwnedGames.Response.Games {
 		usableSteamGameIDs = append(usableSteamGameIDs, strconv.Itoa(games.Appid))
 	}

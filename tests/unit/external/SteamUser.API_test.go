@@ -16,7 +16,7 @@ type SteamUserAPITestSuite struct {
 	mock mocks.SteamUserMockInterface
 }
 
-func TestSteamUserAPITestSuite(t *testing.T){
+func TestSteamUserAPITestSuite(t *testing.T) {
 	suite.Run(t, new(SteamUserAPITestSuite))
 }
 
@@ -27,7 +27,7 @@ func (s *SteamUserAPITestSuite) SetupSuite() {
 }
 
 func (s *SteamUserAPITestSuite) TestGetSteamUserID_Success() {
-	s.mock.SetGetUserID(func(personalURL string) (string, error){
+	s.mock.SetGetUserID(func(personalURL string) (string, error) {
 		return "76561197960287939", nil
 	})
 	t := s.T()
@@ -37,7 +37,7 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserID_Success() {
 }
 
 func (s *SteamUserAPITestSuite) TestGetSteamUserID_Fail() {
-	s.mock.SetGetUserID(func(personalURL string) (string, error){
+	s.mock.SetGetUserID(func(personalURL string) (string, error) {
 		return "", nil
 	})
 	t := s.T()
@@ -46,9 +46,9 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserID_Fail() {
 	assert.EqualValues(t, "", steamUserID)
 }
 
-func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_Success(){
-	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error){
-		return []string{"44","22"}, nil
+func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_Success() {
+	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error) {
+		return []string{"44", "22"}, nil
 	})
 	steamUserID := "76561198017133337"
 	steamGamesIDs, err := Steam.ExternalSteamUserService.GetUserOwnedGames(steamUserID)
@@ -58,8 +58,8 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_Success(){
 	assert.EqualValues(t, "22", steamGamesIDs[1])
 }
 
-func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_OwnesNoGames(){
-	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error){
+func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_OwnesNoGames() {
+	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error) {
 		return []string{}, nil
 	})
 	steamUserID := "76561197960287930"
@@ -69,8 +69,8 @@ func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_OwnesNoGames(){
 	assert.EqualValues(t, 0, len(steamGamesIDs))
 }
 
-func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_BadUserID(){
-	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error){
+func (s *SteamUserAPITestSuite) TestGetSteamUserOwnedGames_BadUserID() {
+	s.mock.SetGetUserOwnedGames(func(personalURL string) ([]string, error) {
 		return []string{}, nil
 	})
 	steamUserID := "thishavenochanceofbeingarealsteamid1324567899876544321"

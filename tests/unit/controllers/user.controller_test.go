@@ -19,13 +19,12 @@ import (
 type UserControllerTestSuite struct {
 	suite.Suite
 	mockUserRoleService mocks.UserRoleServiceMockInterface
-	mockUserService mocks.UserServiceMockInterface
-	r               *gin.Engine
-	rr              *httptest.ResponseRecorder
-
+	mockUserService         mocks.UserServiceMockInterface
+	r                   *gin.Engine
+	rr                  *httptest.ResponseRecorder
 }
 
-func TestUsersControllerTestSuite(t *testing.T){
+func TestUsersControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(UserControllerTestSuite))
 }
 
@@ -91,7 +90,7 @@ func (s *UserControllerTestSuite) TestGetUser_NotFound() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusNotFound, apiErr.Status())
@@ -108,7 +107,7 @@ func (s *UserControllerTestSuite) TestGetUser_DatabaseError() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusInternalServerError, apiErr.Status())
@@ -127,9 +126,9 @@ func (s *UserControllerTestSuite) TestCreateUser_Success() {
 
 	s.mockUserRoleService.SetCreateRole(func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError) {
 		return &domain.UserRole{
-			ID:        1,
-			UserID:    1,
-			Name:      "Admin",
+			ID:     1,
+			UserID: 1,
+			Name:   "Admin",
 		}, nil
 	})
 
@@ -143,7 +142,7 @@ func (s *UserControllerTestSuite) TestCreateUser_Success() {
 
 	var user domain.User
 	err = json.Unmarshal(s.rr.Body.Bytes(), &user)
-	t:= s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
 	assert.EqualValues(t, http.StatusCreated, s.rr.Code)
@@ -160,7 +159,7 @@ func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonBadFieldType() {
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -176,7 +175,7 @@ func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonMissingField() {
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -187,8 +186,8 @@ func (s *UserControllerTestSuite) TestCreateUser_InvalidJsonMissingField() {
 func (s *UserControllerTestSuite) TestUpdateUser_Success() {
 	s.mockUserService.SetUpdateUser(func(user *domain.User) (*domain.User, errorUtils.EntityError) {
 		return &domain.User{
-			ID: 1,
-			Name: "dev updated",
+			ID:    1,
+			Name:  "dev updated",
 			Email: "dev.updated@test.com",
 		}, nil
 	})
@@ -227,14 +226,14 @@ func (s *UserControllerTestSuite) TestUpdateUser_InvalidId() {
 
 func (s *UserControllerTestSuite) TestUpdateUser_InvalidJson() {
 	jsonBody := `{"name":123456, "email":"dev@test.com"}`
-	id:="1"
+	id := "1"
 	req, err := http.NewRequest(http.MethodPatch, "/users/"+id, bytes.NewBufferString(jsonBody))
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
 	}
 	s.r.ServeHTTP(s.rr, req)
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, http.StatusUnprocessableEntity, apiErr.Status())
@@ -256,7 +255,7 @@ func (s *UserControllerTestSuite) TestUpdateUser_ErrorUpdating() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error updating user", apiErr.Message())
@@ -303,7 +302,7 @@ func (s *UserControllerTestSuite) TestDeleteUser_Failure() {
 	s.mockUserService.SetDelete(func(u uint64) errorUtils.EntityError {
 		return errorUtils.NewInternalServerError("error deleting user")
 	})
-	id:="1"
+	id := "1"
 	req, err := http.NewRequest(http.MethodDelete, "/users/"+id, nil)
 	if err != nil {
 		s.T().Errorf("error while creating the request: %v\n", err)
@@ -311,7 +310,7 @@ func (s *UserControllerTestSuite) TestDeleteUser_Failure() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error deleting user", apiErr.Message())
@@ -323,13 +322,13 @@ func (s *UserControllerTestSuite) TestGetAllUsers_Success() {
 	s.mockUserService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
 		return []domain.User{
 			{
-				ID: 1,
-				Name: "dev1",
+				ID:    1,
+				Name:  "dev1",
 				Email: "dev1@test.com",
 			},
 			{
-				ID: 2,
-				Name: "dev2",
+				ID:    2,
+				Name:  "dev2",
 				Email: "dev2@test.com",
 			},
 		}, nil
@@ -346,7 +345,7 @@ func (s *UserControllerTestSuite) TestGetAllUsers_Success() {
 	if theErr != nil {
 		s.T().Errorf("could not unmarshal response: %v\n", theErr)
 	}
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, users)
 	assert.EqualValues(t, users[0].ID, 1)
@@ -356,8 +355,6 @@ func (s *UserControllerTestSuite) TestGetAllUsers_Success() {
 	assert.EqualValues(t, users[1].Name, "dev2")
 	assert.EqualValues(t, users[1].Email, "dev2@test.com")
 }
-
-
 
 func (s *UserControllerTestSuite) TestGetAllUsers_Failure() {
 	s.mockUserService.SetGetAll(func() ([]domain.User, errorUtils.EntityError) {
@@ -370,7 +367,7 @@ func (s *UserControllerTestSuite) TestGetAllUsers_Failure() {
 	s.r.ServeHTTP(s.rr, req)
 
 	apiErr, err := errorUtils.NewApiErrFromBytes(s.rr.Body.Bytes())
-	t:=s.T()
+	t := s.T()
 	assert.Nil(t, err)
 	assert.NotNil(t, apiErr)
 	assert.EqualValues(t, "error getting users", apiErr.Message())
