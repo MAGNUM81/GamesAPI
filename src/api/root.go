@@ -36,7 +36,7 @@ func Bootstrap(r *gin.Engine) {
 	u, _ := services.UsersService.GetUser(uint64(1))
 	masterEmail := "master@test.com"
 	if u == nil {
-		_,_ = services.UsersService.CreateUser(&domain.User{
+		_, _ = services.UsersService.CreateUser(&domain.User{
 			Name:         "master",
 			Email:        masterEmail,
 			PasswordHash: h,
@@ -44,13 +44,13 @@ func Bootstrap(r *gin.Engine) {
 	}
 	role, _ := services.UserRoleService.GetRolesByUserID(uint64(1))
 	if len(role) == 0 {
-		_,_ = services.UserRoleService.CreateRole(&domain.UserRole{
+		_, _ = services.UserRoleService.CreateRole(&domain.UserRole{
 			UserID: 1,
 			Name:   "admin",
 		})
 	}
-	_,_ = fmt.Printf("This is the bypass session key : %s\n", sessionKey)
-	_,_ = fmt.Printf("This is the master email : %s\n", masterEmail)
+	_, _ = fmt.Printf("This is the bypass session key : %s\n", sessionKey)
+	_, _ = fmt.Printf("This is the master email : %s\n", masterEmail)
 	//END : NOT FOR PROD
 
 	router.InitAllRoutes(r)

@@ -123,7 +123,7 @@ func (s *UserSessionHandlerTestSuite) TestUserSessionHandler_SessionIsNotExpired
 		}, nil
 	})
 
-	req, _ :=http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Add("Authorization", "Bearer 123456")
 	s.r.ServeHTTP(s.rr, req)
 	assert.Equal(s.T(), http.StatusOK, s.rr.Code)

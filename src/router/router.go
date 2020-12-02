@@ -27,7 +27,7 @@ func initCoreGroup(r *gin.RouterGroup) {
 	}
 }
 
-func initAuthGroup(g *gin.RouterGroup){
+func initAuthGroup(g *gin.RouterGroup) {
 	auth := g.Group("/auth")
 	{
 		InitLoginRoute(auth)

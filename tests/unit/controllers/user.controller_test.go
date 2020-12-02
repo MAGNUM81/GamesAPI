@@ -19,9 +19,9 @@ import (
 type UserControllerTestSuite struct {
 	suite.Suite
 	mockUserRoleService mocks.UserRoleServiceMockInterface
-	mockService mocks.UserServiceMockInterface
-	r           *gin.Engine
-	rr          *httptest.ResponseRecorder
+	mockService         mocks.UserServiceMockInterface
+	r                   *gin.Engine
+	rr                  *httptest.ResponseRecorder
 }
 
 func TestUsersControllerTestSuite(t *testing.T) {
@@ -126,9 +126,9 @@ func (s *UserControllerTestSuite) TestCreateUser_Success() {
 
 	s.mockUserRoleService.SetCreateRole(func(role *domain.UserRole) (*domain.UserRole, errorUtils.EntityError) {
 		return &domain.UserRole{
-			ID:        1,
-			UserID:    1,
-			Name:      "Admin",
+			ID:     1,
+			UserID: 1,
+			Name:   "Admin",
 		}, nil
 	})
 
