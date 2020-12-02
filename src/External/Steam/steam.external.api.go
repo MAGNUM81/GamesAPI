@@ -1,13 +1,13 @@
 package Steam
 
 import (
+	"GamesAPI/src/domain"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
-	"GamesAPI/src/domain"
 	"strings"
 	"time"
 )
