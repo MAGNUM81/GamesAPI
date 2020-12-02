@@ -24,6 +24,7 @@ func initCoreGroup(r *gin.RouterGroup) {
 		InitHomeRoutes(coreGroup)
 		InitAllGameRoutes(coreGroup)
 		InitAllUserRoutes(coreGroup)
+		InitExternalRoutes(coreGroup)
 	}
 }
 

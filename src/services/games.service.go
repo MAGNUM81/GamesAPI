@@ -17,6 +17,7 @@ type GamesServiceInterface interface {
 	UpdateGame(game *domain.Game) (*domain.Game, errorUtils.EntityError)
 	DeleteGame(uint64) errorUtils.EntityError
 	GetAllGames() ([]domain.Game, errorUtils.EntityError)
+	ExistsWithSteamID(id string) (bool, errorUtils.EntityError)
 }
 
 func (g *gamesService) GetGame(gameId uint64) (*domain.Game, errorUtils.EntityError) {
@@ -79,4 +80,19 @@ func (g *gamesService) DeleteGame(gameId uint64) errorUtils.EntityError {
 		return deleteErr
 	}
 	return nil
+}
+
+func (g *gamesService) ExistsWithSteamID(id string) (bool, errorUtils.EntityError) {
+	games, err := domain.GameRepo.GetAll()
+	exists := false
+	if err != nil {
+		return false, err
+	}
+	for _, game := range games {
+		if game.SteamId == id {
+			exists = true
+			break
+		}
+	}
+	return exists, nil
 }

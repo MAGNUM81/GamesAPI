@@ -19,6 +19,11 @@ type GameServiceMock struct {
 	updateGameService func(*domain.Game) (*domain.Game, errorUtils.EntityError)
 	deleteGameService func(uint64) errorUtils.EntityError
 	getAllGameService func() ([]domain.Game, errorUtils.EntityError)
+	existsWithSteamId func(string) (bool, errorUtils.EntityError)
+}
+
+func (u *GameServiceMock) ExistsWithSteamID(id string) (bool, errorUtils.EntityError) {
+	return u.existsWithSteamId(id)
 }
 
 func (u *GameServiceMock) GetGame(id uint64) (*domain.Game, errorUtils.EntityError) {
