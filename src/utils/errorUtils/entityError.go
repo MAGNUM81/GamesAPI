@@ -13,9 +13,9 @@ type EntityError interface {
 
 type entityError struct {
 	error
-	ErrorMessage string `json:"message"`
-	ErrorStatus  int    `json:"status"`
-	ErrError     string `json:"error"`
+	ErrorMessage string `json:"Message"`
+	ErrorStatus  int    `json:"Status"`
+	ErrError     string `json:"Error"`
 }
 
 func (e *entityError) Error() string {
