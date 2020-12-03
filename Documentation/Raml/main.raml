@@ -7,13 +7,30 @@ traits:
         description: Chaine de charactères de format `email;password`
         type: string
         required: true
+    responses:
+      200:
+        headers:
+          Authorization:
+            displayName: Authorization
+            description: Chaine de charactères contenant le token de session
+            type: string
   hasRestrictedAccess:
     headers:
       Authorization:
         displayName: Authorization
-        description: token de type "Bearer" obtenu via un Login
+        description: Token obtenu via un Login réussi. Valide pendant 10 minutes.
         type: bearer token
         required: true
+    responses:
+      403:
+        body:
+          application/json:
+            description: erreur lors de l'accès à un chemin restreint
+            type: string
+            example: |
+              {
+                "Error" : "query rule violation: ensure 'userId' = '<nil>', instead got: ''"
+              }
   hasAPIKey:
     headers:
       x-api-key:
