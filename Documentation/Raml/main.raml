@@ -43,19 +43,19 @@ baseUri: "http://localhost:8080/"
 /:
   displayName: Salutations
   get:
-    is: [ "hasAPIKey" ]
+    is: [ hasAPIKey ]
     description: Salue l'usager
 /auth:
   displayName: Authentification
   /login:
     post:
-      is: [ "hasAPIKey","isLogin" ]
+      is: [ hasAPIKey, isLogin ]
       description: Obtenir un token de session afin de s'authentifier lors des prochains appels à des chemins restreints.
 
 /users:
   displayName: Usagers
   get:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
     description: fetch tous les usagers
     responses:
       200:
@@ -76,7 +76,7 @@ baseUri: "http://localhost:8080/"
                   ...
               ]
   post:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
     description: créer un usager
     body:
       application/json:
@@ -104,37 +104,37 @@ baseUri: "http://localhost:8080/"
               }
   /{id}:
     get:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
       description: fetch un usager en particulier
     patch:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
       description: MAJ un usager en particulier
     delete:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
       description: supprimer un usager en particulier
 
 /games:
   displayName: Jeux
   get:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
   post:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
   /{id}:
     get:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
     patch:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
     delete:
-      is: [ "hasAPIKey", "hasRestrictedAccess" ]
+      is: [ hasAPIKey, hasRestrictedAccess ]
 /LinkSteamUser:
   displayName: Associer un User ID Steam
   post:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
 
 /SyncGames:
   displayName: Synchronisation de jeux
   post:
-    is: [ "hasAPIKey", "hasRestrictedAccess" ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
 
 
 
