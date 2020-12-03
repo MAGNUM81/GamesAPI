@@ -1,43 +1,81 @@
 #%RAML 1.0
-
-
+traits:
+  isLogin:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: Chaine de charactères de format `email;password`
+        type: string
+        required: true
+  hasRestrictedAccess:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: token de type "Bearer" obtenu via un Login
+        type: bearer token
+        required: true
+  hasAPIKey:
+    headers:
+      x-api-key:
+        displayName: x-api-key
+        description: Clé d'API obtenue auprès du support de GamesAPI
+        type: string
+        required: true
 title: Game API
 baseUri: "http://localhost:8080/"
 /:
   displayName: Salutations
-  description: Pour dire salutations à l'usager
-
+  get:
+    is: [ "hasAPIKey" ]
+    description: Salue l'usager
 /auth:
+  displayName: Authentification
   /login:
     post:
+      is: [ "hasAPIKey","isLogin" ]
       description: usager -> login
 
 /users:
+  displayName: Usagers
   get:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
     description: fetch tous les usagers
   post:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
     description: créer un usager
   /{id}:
     get:
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
       description: fetch un usager en particulier
     patch:
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
       description: MAJ un usager en particulier
     del:
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
       description: supprimer un usager en particulier
 
 /games:
+  displayName: Jeux
   get:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
   post:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
   /{id}:
     get:
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
     patch:
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
     del:
-
+      is: [ "hasAPIKey", "hasRestrictedAccess" ]
 /LinkSteamUser:
+  displayName: Associer un User ID Steam
   post:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
 
 /SyncGames:
+  displayName: Synchronisation de jeux
   post:
+    is: [ "hasAPIKey", "hasRestrictedAccess" ]
 
 
 
