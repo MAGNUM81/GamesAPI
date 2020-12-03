@@ -22,7 +22,16 @@ traits:
         type: bearer token
         required: true
     responses:
+      400:
+        description: La ressource demandée n'existe pas
+        body:
+          application/json:
+            example: |
+              {
+                  "Error": "resource does not exist"
+              }
       403:
+        description: L'action à effectuer sur une ressource n'est pas autorisée pour le rôle de l'usager
         body:
           application/json:
             description: erreur lors de l'accès à un chemin restreint
@@ -38,13 +47,60 @@ traits:
         description: Clé d'API obtenue auprès du support de GamesAPI
         type: string
         required: true
+  throwsEntityError:
+    responses:
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "entity id should be a number",
+                "Status"?: 400,
+                "Error": "bad_request"
+              }
+      404:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "entity was not found",
+                "Status"?: 400,
+                "Error": "not_found"
+              }
+      422:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "invalid json body",
+                "Status"?: 422,
+                "Error": "invalid_request"
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "Message": "error updating entity",
+                "Status": 500,
+                "Error": "server_error"
+              }
 title: Game API
 baseUri: "http://localhost:8080/"
 /:
   displayName: Salutations
   get:
-    is: [ hasAPIKey ]
+    is: [ hasAPIKey, hasRestrictedAccess ]
     description: Salue l'usager
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Message":"Welcome to GamesAPI!"
+              }
+
 /auth:
   displayName: Authentification
   /login:
@@ -55,7 +111,7 @@ baseUri: "http://localhost:8080/"
 /users:
   displayName: Usagers
   get:
-    is: [ hasAPIKey, hasRestrictedAccess ]
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
     description: fetch tous les usagers
     responses:
       200:
@@ -76,7 +132,7 @@ baseUri: "http://localhost:8080/"
                   ...
               ]
   post:
-    is: [ hasAPIKey, hasRestrictedAccess ]
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
     description: créer un usager
     body:
       application/json:
@@ -104,28 +160,45 @@ baseUri: "http://localhost:8080/"
               }
   /{id}:
     get:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
       description: fetch un usager en particulier
     patch:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
       description: MAJ un usager en particulier
     delete:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
       description: supprimer un usager en particulier
 
 /games:
   displayName: Jeux
   get:
-    is: [ hasAPIKey, hasRestrictedAccess ]
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
   post:
-    is: [ hasAPIKey, hasRestrictedAccess ]
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
   /{id}:
     get:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                    "id": 1,
+                    "created_at": "2020-12-02T23:21:12.5631303-05:00",
+                    "updated_at": "2020-12-02T23:21:12.5631303-05:00",
+                    "deleted_at": null,
+                    "title": "Subnautica",
+                    "developer": "Whatever",
+                    "publisher": "OK",
+                    "releaseDate": "0001-01-01T00:00:00Z",
+                    "steam_id": ""
+                }
+
     patch:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
     delete:
-      is: [ hasAPIKey, hasRestrictedAccess ]
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
 /LinkSteamUser:
   displayName: Associer un User ID Steam
   post:
