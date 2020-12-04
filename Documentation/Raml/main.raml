@@ -330,14 +330,18 @@ baseUri: "http://localhost:8080/"
   displayName: Synchronisation de jeux
   post:
     is: [ hasAPIKey, hasRestrictedAccess ]
-    description:
+    description: synchronise la liste de jeux de l'utilisateur à celle de son id de steam
     responses:
       200:
         body:
           application/json:
             example:  |
-              {}
-              # description et exemple a remplire
+              {
+              "number of games inserted" : 70,
+              "number of games errored"  : 135,
+              "number of games skipped"  : 60
+              }
+
 
 
 
