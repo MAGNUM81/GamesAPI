@@ -24,12 +24,13 @@ func (g *Game) Validate() errorUtils.EntityError {
 	}
 
 	//check for empty developer
-	if g.Developer == "" {
-		return errorUtils.NewUnprocessableEntityError("Game developer cannot be empty")
-	}
+	//Steam sometimes return an empty developer list... let's skip this then
+	//if g.Developer == "" {
+	//	return errorUtils.NewUnprocessableEntityError("Game developer cannot be empty")
+	//}
 
 	//check for empty publisher
-	//Steam sometimes return an empty publisher... let's skip this then
+	//Steam sometimes return an empty publisher list... let's skip this then
 	//if g.Publisher == "" {
 	//	return errorUtils.NewUnprocessableEntityError("Game publisher cannot be empty")
 	//}
