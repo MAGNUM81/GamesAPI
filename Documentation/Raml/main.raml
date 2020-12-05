@@ -38,7 +38,7 @@ traits:
             type: string
             example: |
               {
-                "Error" : "query rule violation: ensure 'userId' = '<nil>', instead got: ''"
+                  "Error": "query rule violation: ensure 'userId' = '3', instead got: '2'"
               }
   hasAPIKey:
     headers:
@@ -81,8 +81,8 @@ traits:
           application/json:
             example: |
               {
-                "Message": "error updating entity",
-                "Status": 500,
+                "Message"?: "error updating entity",
+                "Status"?: 500,
                 "Error": "server_error"
               }
 title: Game API
@@ -180,6 +180,13 @@ baseUri: "http://localhost:8080/"
     patch:
       is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
       description: MAJ un usager en particulier
+      body:
+        application/json:
+          example: |
+            {
+                "userid":1,
+                "profile_url":"https://steamcommunity.com/id/magnum812/"
+            }
       responses:
         200:
           body:
@@ -245,6 +252,14 @@ baseUri: "http://localhost:8080/"
   post:
     is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
     description: créer un jeu
+    body:
+      application/json:
+        example: |
+          {
+              "title":"Resident Evil HD Remaster",
+              "developer":"Capcom Production Studio 4",
+              "publisher":"Capcom"
+          }
     responses:
       200:
         body:
@@ -271,13 +286,13 @@ baseUri: "http://localhost:8080/"
             application/json:
               example: |
                 {
-                    "id": 1,
-                    "created_at": "2020-12-02T23:21:12.5631303-05:00",
-                    "updated_at": "2020-12-02T23:21:12.5631303-05:00",
+                    "id": 4,
+                    "created_at": "2020-12-03T09:29:35.3769503-05:00",
+                    "updated_at": "2020-12-03T09:29:35.3769503-05:00",
                     "deleted_at": null,
-                    "title": "Subnautica",
-                    "developer": "Whatever",
-                    "publisher": "OK",
+                    "title": "Resident Evil HD Remaster",
+                    "developer": "Capcom Production Studio 4",
+                    "publisher": "Capcom",
                     "releaseDate": "0001-01-01T00:00:00Z",
                     "steam_id": ""
                 }
@@ -285,6 +300,14 @@ baseUri: "http://localhost:8080/"
     patch:
       is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
       description: MAJ un jeu en particulier
+      body:
+        application/json:
+          example: |
+            {
+                "title":"Resident Evil 4K UHD Remaster",
+                "developer":"Capcom",
+                "publisher":"Capcom Japan"
+            }
       responses:
         200:
           body:
@@ -295,9 +318,9 @@ baseUri: "http://localhost:8080/"
                     "created_at": "2020-12-03T09:23:18.8421283-05:00",
                     "updated_at": "2020-12-03T09:23:18.8421283-05:00",
                     "deleted_at": null,
-                    "title": "Resident Evil HD Remaster",
-                    "developer": "Capcom Production Studio 4",
-                    "publisher": "Capcom",
+                    "title": "Resident Evil 4K UHD Remaster",
+                    "developer": "Capcom",
+                    "publisher": "Capcom Japan",
                     "releaseDate": "0001-01-01T00:00:00Z",
                     "steam_id": ""
                 }
@@ -316,7 +339,14 @@ baseUri: "http://localhost:8080/"
   displayName: Associer un User ID Steam
   post:
     is: [ hasAPIKey, hasRestrictedAccess ]
-    description: join un user api a un user Steam
+    description: Associe un ID Steam à un usager existant déjà dans la base de données de GamesAPI.
+    body:
+      application/json:
+        example: |
+          {
+              "userid":1,
+              "profile_url":"https://steamcommunity.com/id/magnum812/"
+          }
     responses:
       200:
         body:
@@ -331,6 +361,12 @@ baseUri: "http://localhost:8080/"
   post:
     is: [ hasAPIKey, hasRestrictedAccess ]
     description: synchronise la liste de jeux de l'utilisateur à celle de son id de steam
+    body:
+      application/json:
+        example: |
+          {
+              "userid":1
+          }
     responses:
       200:
         body:
