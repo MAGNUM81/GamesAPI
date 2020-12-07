@@ -1,0 +1,383 @@
+#%RAML 1.0
+traits:
+  isLogin:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: Chaine de charactères de format `email;password`
+        type: string
+        required: true
+    responses:
+      200:
+        headers:
+          Authorization:
+            displayName: Authorization
+            description: Chaine de charactères contenant le token de session
+            type: string
+  hasRestrictedAccess:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: Token obtenu via un Login réussi. Valide pendant 10 minutes.
+        type: bearer token
+        required: true
+    responses:
+      400:
+        description: La ressource demandée n'existe pas
+        body:
+          application/json:
+            example: |
+              {
+                  "Error": "resource does not exist"
+              }
+      403:
+        description: L'action à effectuer sur une ressource n'est pas autorisée pour le rôle de l'usager
+        body:
+          application/json:
+            description: erreur lors de l'accès à un chemin restreint
+            type: string
+            example: |
+              {
+                  "Error": "query rule violation: ensure 'userId' = '3', instead got: '2'"
+              }
+  hasAPIKey:
+    headers:
+      x-api-key:
+        displayName: x-api-key
+        description: Clé d'API obtenue auprès du support de GamesAPI
+        type: string
+        required: true
+  throwsEntityError:
+    responses:
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "entity id should be a number",
+                "Status"?: 400,
+                "Error": "bad_request"
+              }
+      404:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "entity was not found",
+                "Status"?: 400,
+                "Error": "not_found"
+              }
+      422:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "invalid json body",
+                "Status"?: 422,
+                "Error": "invalid_request"
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "Message"?: "error updating entity",
+                "Status"?: 500,
+                "Error": "server_error"
+              }
+title: Game API
+baseUri: "http://localhost:8080/"
+/:
+  displayName: Salutations
+  get:
+    is: [ hasAPIKey, hasRestrictedAccess ]
+    description: Salue l'usager
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "Message":"Welcome to GamesAPI!"
+              }
+
+/auth:
+  displayName: Authentification
+  /login:
+    post:
+      is: [ hasAPIKey, isLogin ]
+      description: Obtenir un token de session afin de s'authentifier lors des prochains appels à des chemins restreints.
+
+/users:
+  displayName: Usagers
+  get:
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+    description: fetch tous les usagers
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                  {
+                      "id": 1,
+                      "created_at": "2020-12-02T19:17:33.7768138-05:00",
+                      "updated_at": "2020-12-02T19:17:33.7768138-05:00",
+                      "deleted_at": null,
+                      "name": "master",
+                      "email": "master@test.com",
+                      "password_hash": "$2a$10$oT9RIIgxLsOPZZts7SEgV.2drgixOViVxRgRpQHfW6YeQYnDAriAC",
+                      "steam_user_id": "nullid"
+                  },
+                  ...
+              ]
+  post:
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+    description: créer un usager
+    body:
+      application/json:
+        example: |
+          {
+              "email":"dev2@test.com",
+              "name":"dev2",
+              "role":"admin",
+              "password":"network7"
+          }
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              {
+                  "id": 2,
+                  "created_at": "2020-12-02T19:18:07.2384662-05:00",
+                  "updated_at": "2020-12-02T19:18:07.2384662-05:00",
+                  "deleted_at": null,
+                  "name": "dev2",
+                  "email": "dev2@test.com",
+                  "password_hash": "$2a$10$neYZjTwKSxgNV9VIftEM4eqoyUD/XfnEMWH4q.KCKe7oVMiHBVRly",
+                  "steam_user_id": "nullid"
+              }
+  /{id}:
+    get:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: fetch un usager en particulier
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "id": 1,
+                  "created_at": "2020-11-18T11:07:12.1577435-05:00",
+                  "updated_at": "2020-11-18T11:07:12.1577435-05:00",
+                  "deleted_at": null,
+                  "name": "dev1",
+                  "email": "dev1@test.com",
+                  "password_hash": "hashpass",
+                  "steam_user_id": "nullid"
+                }
+    patch:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: MAJ un usager en particulier
+      body:
+        application/json:
+          example: |
+            {
+                "userid":1,
+                "profile_url":"https://steamcommunity.com/id/magnum812/"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "id": 2,
+                  "created_at": "2020-12-03T09:03:59.5623408-05:00",
+                  "updated_at": "2020-12-03T09:03:59.5623408-05:00",
+                  "deleted_at": null,
+                  "name": "Team2Dev",
+                  "email": "dev2@test.ca",
+                  "password_hash": "$2a$10$28q413bjQ8ra0Z73ueEcPOZ2uGIEkZpOppDoJLCqsmusTvTsxYbzC",
+                "steam_user_id": ""
+                }
+    delete:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: supprimer un usager en particulier
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                 {
+                    "status": "deleted"
+                 }
+
+/games:
+  displayName: Jeux
+  get:
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+    description: fetch tous les jeux
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             { [
+                  {
+                      "id": 3,
+                      "created_at": "2020-12-03T09:29:25.9114369-05:00",
+                      "updated_at": "2020-12-03T09:29:25.9114369-05:00",
+                      "deleted_at": null,
+                      "title": "Subnautica",
+                      "developer": "Whatever",
+                      "publisher": "OK",
+                      "releaseDate": "0001-01-01T00:00:00Z",
+                      "steam_id": ""
+                  },
+                  {
+                      "id": 4,
+                      "created_at": "2020-12-03T09:29:35.3769503-05:00",
+                      "updated_at": "2020-12-03T09:29:35.3769503-05:00",
+                      "deleted_at": null,
+                      "title": "Resident Evil HD Remaster",
+                      "developer": "Capcom Production Studio 4",
+                      "publisher": "Capcom",
+                      "releaseDate": "0001-01-01T00:00:00Z",
+                      "steam_id": ""
+                  }
+              ]}
+
+  post:
+    is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+    description: créer un jeu
+    body:
+      application/json:
+        example: |
+          {
+              "title":"Resident Evil HD Remaster",
+              "developer":"Capcom Production Studio 4",
+              "publisher":"Capcom"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:  |
+              {
+                  "id": 4,
+                  "created_at": "2020-12-03T09:29:35.3769503-05:00",
+                  "updated_at": "2020-12-03T09:29:35.3769503-05:00",
+                  "deleted_at": null,
+                  "title": "Resident Evil HD Remaster",
+                  "developer": "Capcom Production Studio 4",
+                  "publisher": "Capcom",
+                  "releaseDate": "0001-01-01T00:00:00Z",
+                  "steam_id": ""
+              }
+  /{id}:
+    get:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: fetch un jeu en particulier
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                    "id": 4,
+                    "created_at": "2020-12-03T09:29:35.3769503-05:00",
+                    "updated_at": "2020-12-03T09:29:35.3769503-05:00",
+                    "deleted_at": null,
+                    "title": "Resident Evil HD Remaster",
+                    "developer": "Capcom Production Studio 4",
+                    "publisher": "Capcom",
+                    "releaseDate": "0001-01-01T00:00:00Z",
+                    "steam_id": ""
+                }
+
+    patch:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: MAJ un jeu en particulier
+      body:
+        application/json:
+          example: |
+            {
+                "title":"Resident Evil 4K UHD Remaster",
+                "developer":"Capcom",
+                "publisher":"Capcom Japan"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example:  |
+                {
+                    "id": 2,
+                    "created_at": "2020-12-03T09:23:18.8421283-05:00",
+                    "updated_at": "2020-12-03T09:23:18.8421283-05:00",
+                    "deleted_at": null,
+                    "title": "Resident Evil 4K UHD Remaster",
+                    "developer": "Capcom",
+                    "publisher": "Capcom Japan",
+                    "releaseDate": "0001-01-01T00:00:00Z",
+                    "steam_id": ""
+                }
+    delete:
+      is: [ hasAPIKey, hasRestrictedAccess, throwsEntityError ]
+      description: supprime un jeu en particulier
+      responses:
+        200:
+          body:
+            application/json:
+              example:  |
+                {
+                    "status": "deleted"
+                }
+/LinkSteamUser:
+  displayName: Associer un User ID Steam
+  post:
+    is: [ hasAPIKey, hasRestrictedAccess ]
+    description: Associe un ID Steam à un usager existant déjà dans la base de données de GamesAPI.
+    body:
+      application/json:
+        example: |
+          {
+              "userid":1,
+              "profile_url":"https://steamcommunity.com/id/magnum812/"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:  |
+              {
+                  "Message": "Success"
+              }
+
+/SyncGames:
+  displayName: Synchronisation de jeux
+  post:
+    is: [ hasAPIKey, hasRestrictedAccess ]
+    description: synchronise la liste de jeux de l'utilisateur à celle de son id de steam
+    body:
+      application/json:
+        example: |
+          {
+              "userid":1
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:  |
+              {
+              "number of games inserted" : 70,
+              "number of games errored"  : 135,
+              "number of games skipped"  : 60
+              }
+
+
+
+
