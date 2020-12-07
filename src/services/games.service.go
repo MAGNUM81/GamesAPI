@@ -60,6 +60,7 @@ func (g *gamesService) UpdateGame(game *domain.Game) (*domain.Game, errorUtils.E
 	current.Developer = game.Developer
 	current.Publisher = game.Publisher
 	current.Title = game.Title
+	current.SteamId = game.SteamId
 	current.ReleaseDate = game.ReleaseDate
 
 	updatedGame, err := domain.GameRepo.Update(current)
