@@ -3,11 +3,11 @@ package domain
 type contextKey string
 
 var (
-	contextKeyRbacUserId = contextKey("rbac.userId")
+	contextKeyRbacUserId = contextKey("userId")
 )
 
 func (c contextKey) String() string {
-	return "domain context key " + string(c)
+	return string(c)
 }
 
 func ContextKey(s string) string {

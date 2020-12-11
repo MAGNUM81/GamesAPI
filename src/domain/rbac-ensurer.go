@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"path"
 )
 
 type Ensurer struct {
@@ -23,6 +24,9 @@ func (ens Ensurer) QueryComplies(ctx context.Context, url *url.URL) error {
 
 	for _, rule := range ens.Query {
 		actual := url.Query().Get(rule.Key)
+		if actual == "" {
+			actual = path.Base(url.Path)
+		}
 		expected, err := rule.FromContext(ctx)
 		if err != nil {
 			return err

@@ -47,7 +47,8 @@ func (g *gameRepo) Create(game *Game) (*Game, errorUtils.EntityError) {
 }
 
 func (g *gameRepo) Update(game *Game) (*Game, errorUtils.EntityError) {
-	if err := g.db.Where("id = ?", game.ID).First(&game).Error; err != nil {
+	var current Game
+	if err := g.db.Where("id = ?", game.ID).First(&current).Error; err != nil {
 		return nil, errorUtils.NewNotFoundError(err.Error())
 	}
 	g.db.Save(*game)
